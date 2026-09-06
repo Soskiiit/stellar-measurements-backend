@@ -1,0 +1,152 @@
+.tile-page {
+    background: var(--color-primary);
+}
+
+.tile-container {
+    max-width: 360px;
+    margin: 0 auto;
+    padding: 16px 20px;
+}
+
+.tile-header {
+    font-family: var(--font-main);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-accent);
+    margin-bottom: 12px;
+}
+
+.tile-filter-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    align-items: flex-end;
+}
+
+.tile-filter-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-filter-label {
+    font-family: var(--font-main);
+    font-size: 12px;
+    color: var(--color-text-label);
+    margin-bottom: 4px;
+}
+
+.tile-filter-input {
+    background: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 1px;
+    color: var(--color-text);
+    padding: 8px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    -moz-appearance: textfield;
+}
+
+.tile-filter-input::-webkit-outer-spin-button,
+.tile-filter-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.tile-filter-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.tile-filter-btn {
+    background: var(--color-btn);
+    color: var(--color-btn-text);
+    border: none;
+    border-radius: 2px;
+    padding: 8px 20px;
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.tile-filter-btn:hover {
+    opacity: 0.85;
+}
+
+.tile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.tile-card {
+    background: var(--color-primary);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-card:hover {
+    transform: translateY(-2px);
+}
+
+.tile-card-image {
+    width: 100%;
+    height: 155px;
+    overflow: hidden;
+}
+
+.tile-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tile-card-info {
+    background: var(--color-card-info-bg);
+    padding: 8px 11px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+}
+
+.tile-card-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.tile-card-name {
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-accent-light);
+    margin-bottom: 4px;
+}
+
+.tile-card-meta {
+    font-family: var(--font-main);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+}
+
+.tile-card-likes {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-main);
+    font-size: 10px;
+    color: var(--color-text-muted);
+}
+
+.tile-card-like-icon {
+    font-size: 14px;
+}

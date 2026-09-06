@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#643918">
+    <title>Добавление — Звёздные измерения</title>
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/add.css">
+</head>
+<body class="add-page">
+    <header class="header">
+        <a href="/" class="header-logo">⭗ StarParallax</a>
+    </header>
+
+    <div class="add-container">
+        <div class="add-header-row">
+            <h1 class="add-header">Новая звезда</h1>
+            <span class="add-status-badge">Черновик</span>
+        </div>
+
+        <div class="add-section">
+            <h2 class="add-section-title">Медиа</h2>
+            <div class="add-media-grid">
+                <label class="add-media-box" for="star-image">
+                    <img src="/static/img/image.png" alt="Фото" class="add-media-icon">
+                    <span class="add-media-label">Фото звезды</span>
+                    <input type="file" id="star-image" name="image" accept="image/*" hidden>
+                </label>
+                <label class="add-media-box" for="star-video">
+                    <img src="/static/img/video.png" alt="Видео" class="add-media-icon">
+                    <span class="add-media-label">Видео звезды</span>
+                    <input type="file" id="star-video" name="video" accept="video/*" hidden>
+                </label>
+            </div>
+        </div>
+
+        <div class="add-section">
+            <h2 class="add-section-title">О звезде</h2>
+
+            <div class="add-field">
+                <label class="add-label">Название звезды</label>
+                <input type="text" name="name" class="add-input" placeholder="Например: Сириус">
+            </div>
+
+            <div class="add-field">
+                <label class="add-label">Описание</label>
+                <textarea name="description" class="add-textarea" placeholder="Краткое описание звезды, спектральный класс, созвездие..."></textarea>
+            </div>
+
+            <div class="add-field">
+                <label class="add-label">Годовой параллакс, мас</label>
+                <input type="number" step="0.001" name="parallax" class="add-input" placeholder="0.379">
+            </div>
+
+            <div class="add-field">
+                <label class="add-label">Расстояние, пк</label>
+                <input type="number" step="0.01" name="distance" class="add-input" placeholder="2.64">
+            </div>
+        </div>
+
+        <button class="add-save-btn">Сохранить черновик</button>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/feed/1" class="nav-item">
+            <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
+            <span>Лента</span>
+        </a>
+        <a href="/add" class="nav-item active">
+            <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
+            <span>Добавить</span>
+        </a>
+        <a href="/" class="nav-item">
+            <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
+            <span>Каталог</span>
+        </a>
+    </nav>
+</body>
+</html>

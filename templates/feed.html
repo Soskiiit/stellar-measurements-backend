@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#643918">
+    <title>{{ .star.Name }} — Звёздные измерения</title>
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/feed.css">
+</head>
+<body class="feed-page">
+    <header class="header">
+        <a href="/" class="header-logo">⭗ StarParallax</a>
+    </header>
+
+    <div class="feed-container">
+        <div class="feed-video-bg">
+            <video autoplay muted loop playsinline class="feed-video">
+                <source src="{{ .star.VideoURL }}" type="video/mp4">
+            </video>
+        </div>
+        <div class="feed-overlay">
+            <div class="feed-content">
+                <h1 class="feed-title">{{ .star.Name }}</h1>
+                <p class="feed-description">{{ .star.Description }}</p>
+                <div class="feed-fields">
+                    <div class="feed-field">
+                        <span class="feed-field-value">Параллакс: {{ printf "%.3f" .star.Parallax }}"</span>
+                    </div>
+                    <div class="feed-field">
+                        <span class="feed-field-value">Расстояние: {{ printf "%.2f" .star.Distance }} пк</span>
+                    </div>
+                </div>
+                <div class="feed-actions">
+                    <div class="feed-likes">
+                        <span class="feed-like-icon">&#9825;</span>
+                        <span class="feed-like-count">{{ len .star.Likes }}</span>
+                    </div>
+                    <a href="/feed/{{ .star.ID }}?next=true" class="feed-next-btn">Следующая &darr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/feed/1" class="nav-item active">
+            <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
+            <span>Лента</span>
+        </a>
+        <a href="/add" class="nav-item">
+            <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
+            <span>Добавить</span>
+        </a>
+        <a href="/" class="nav-item">
+            <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
+            <span>Каталог</span>
+        </a>
+    </nav>
+</body>
+</html>

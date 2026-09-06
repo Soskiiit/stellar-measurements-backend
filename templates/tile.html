@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#643918">
+    <title>Плитка — Звёздные измерения</title>
+    <link rel="stylesheet" href="/static/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/gallery.css">
+</head>
+<body class="tile-page">
+    <header class="header">
+        <a href="/" class="header-logo">⭗ StarParallax</a>
+    </header>
+
+    <div class="tile-container">
+        <h1 class="tile-header">Каталог звёзд</h1>
+
+        <form action="/" method="GET" class="tile-filter-form">
+            <div class="tile-filter-group">
+                <label class="tile-filter-label">Расстояние до, пк</label>
+                <input type="number" step="0.001" name="parallax" class="tile-filter-input"
+                       placeholder="2,64" value="{{ .parallax }}">
+            </div>
+            <button type="submit" class="tile-filter-btn">Поиск</button>
+        </form>
+
+        <div class="tile-grid">
+            {{ range .stars }}
+            <a href="/feed/{{ .ID }}" class="tile-card">
+                <div class="tile-card-image">
+                    <img src="{{ .ImageURL }}" alt="{{ .Name }}">
+                </div>
+                <div class="tile-card-info">
+                    <div class="tile-card-details">
+                        <span class="tile-card-name">{{ .Name }}</span>
+                        <span class="tile-card-meta">D = {{ printf "%.2f" .Distance }} пк</span>
+                    </div>
+                    <span class="tile-card-likes">
+                        <span class="tile-card-like-icon">&#9825;</span>
+                        {{ len .Likes }}
+                    </span>
+                </div>
+            </a>
+            {{ end }}
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/feed/1" class="nav-item">
+            <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
+            <span>Лента</span>
+        </a>
+        <a href="/add" class="nav-item">
+            <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
+            <span>Добавить</span>
+        </a>
+        <a href="/" class="nav-item active">
+            <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
+            <span>Каталог</span>
+        </a>
+    </nav>
+</body>
+</html>
