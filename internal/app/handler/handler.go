@@ -31,14 +31,26 @@ func (h *Handler) GetFeed(ctx *gin.Context) {
 
 	if ctx.Query("next") == "true" {
 		stars, _ := h.Repository.GetPublishedStars()
-		for i, s := range stars {
-			if s.ID == id && i+1 < len(stars) {
-				ctx.Redirect(http.StatusFound, "/feed/"+strconv.Itoa(stars[i+1].ID))
-				return
+		if len(stars) > 0 {
+			minID := stars[0].ID
+			for _, s := range stars {
+				if s.ID < minID {
+					minID = s.ID
+				}
 			}
+			for i, s := range stars {
+				if s.ID == id {
+					if i+1 < len(stars) {
+						ctx.Redirect(http.StatusFound, "/feed/"+strconv.Itoa(stars[i+1].ID))
+					} else {
+						ctx.Redirect(http.StatusFound, "/feed/"+strconv.Itoa(minID))
+					}
+					return
+				}
+			}
+			ctx.Redirect(http.StatusFound, "/feed/"+strconv.Itoa(minID))
+			return
 		}
-		ctx.Redirect(http.StatusFound, "/feed/"+idStr)
-		return
 	}
 
 	star, err := h.Repository.GetStarByID(id)
@@ -67,21 +79,21 @@ func (h *Handler) GetDraft(ctx *gin.Context) {
 }
 
 func (h *Handler) GetTileList(ctx *gin.Context) {
-	parallaxStr := ctx.Query("parallax")
+	distanceStr := ctx.Query("distance")
 
 	var stars []repository.Star
 	var err error
 
-	if parallaxStr == "" {
+	if distanceStr == "" {
 		stars, err = h.Repository.GetPublishedStars()
 	} else {
-		parallax, parseErr := strconv.ParseFloat(parallaxStr, 64)
+		distance, parseErr := strconv.ParseFloat(distanceStr, 64)
 		if parseErr != nil {
 			logrus.Error(parseErr)
-			ctx.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Неверное значение параллакса"})
+			ctx.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Неверное значение расстояния"})
 			return
 		}
-		stars, err = h.Repository.GetStarsByParallax(parallax)
+		stars, err = h.Repository.GetStarsByDistance(distance)
 	}
 
 	if err != nil {
@@ -94,6 +106,6 @@ func (h *Handler) GetTileList(ctx *gin.Context) {
 
 	ctx.HTML(http.StatusOK, "tile.html", gin.H{
 		"stars":    stars,
-		"parallax": parallaxStr,
+		"distance": distanceStr,
 	})
 }

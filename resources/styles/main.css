@@ -4,30 +4,20 @@
 /* Цвета а переменные, ещё 100 раз красить буду :( */
 :root {
     --color-primary: #FFFFFF;
-    --color-header: #643918;
-    --color-logo: #F4E0C5;
-    --color-accent: #864415;
-    --color-accent-light: #864517;
+    --color-header: #630;
+    --color-beige: #D2AB7C;
+    --color-brown: #884411;
     --color-card-border: #936201;
-    --color-card-info-bg: #F4E1C6;
-    --color-nav-bg: #D2AB7C;
     --color-nav-active: #B78E6E;
     --color-text: #000000;
     --color-text-muted: #5A5A5A;
-    --color-text-label: #492A0D;
-    --color-input-bg: #F4F4F4;
+    --color-text-label: #884411;
+    --color-input-bg: #FFFFFF;
     --color-input-border: #906E4B;
-    --color-btn: #864415;
-    --color-btn-text: #FFFFFF;
-    --color-draft-bg: #F5E1C7;
-    --color-draft-text: #864415;
     --color-overlay: rgba(20, 8, 2, 0.78);
     --color-overlay-border: rgba(102, 51, 0, 0.5);
     --color-badge-bg: rgba(255, 235, 205, 0.15);
     --color-badge-border: rgba(255, 235, 205, 0.3);
-    --color-badge-text: #F4E1C5;
-    --color-feed-name: #F4E0C5;
-    --color-feed-desc: #DECCB0;
     --radius: 2px;
     --radius-sm: 1px;
     --radius-card: 2px;
@@ -65,7 +55,7 @@ body {
     font-family: var(--font-main);
     font-size: 18px;
     font-weight: 700;
-    color: var(--color-logo);
+    color: var(--color-beige);
     text-decoration: none;
     letter-spacing: 1px;
 }
@@ -81,7 +71,7 @@ body {
     left: 0;
     right: 0;
     height: 56px;
-    background: var(--color-nav-bg);
+    background: var(--color-beige);
     display: flex;
     z-index: 200;
 }
@@ -93,7 +83,7 @@ body {
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: #010102;
+    color: var(--color-text);
     font-family: var(--font-main);
     font-size: 12px;
     font-weight: 700;
@@ -135,7 +125,7 @@ body {
     font-family: var(--font-main);
     font-size: 24px;
     font-weight: 700;
-    color: var(--color-accent);
+    color: var(--color-brown);
     margin-bottom: 12px;
 }
 
@@ -148,8 +138,8 @@ body {
 
 .error-link {
     display: inline-block;
-    background: var(--color-btn);
-    color: var(--color-btn-text);
+    background: var(--color-brown);
+    color: var(--color-primary);
     padding: 12px 24px;
     border-radius: 2px;
     text-decoration: none;

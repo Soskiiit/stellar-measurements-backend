@@ -19,12 +19,12 @@
     font-family: var(--font-main);
     font-size: 16px;
     font-weight: 700;
-    color: var(--color-accent);
+    color: var(--color-brown);
 }
 
 .add-status-badge {
-    background: var(--color-draft-bg);
-    color: var(--color-draft-text);
+    background: var(--color-beige);
+    color: var(--color-brown);
     font-family: var(--font-main);
     font-size: 14px;
     font-weight: 700;
@@ -33,7 +33,7 @@
 }
 
 .add-section {
-    background: var(--color-draft-bg);
+    background: var(--color-beige);
     border: 1px solid var(--color-card-border);
     border-radius: 3px;
     padding: 14px;
@@ -45,7 +45,7 @@
     font-family: var(--font-main);
     font-size: 12px;
     font-weight: 700;
-    color: var(--color-accent);
+    color: var(--color-brown);
     letter-spacing: 10%;
     margin-bottom: 12px;
 }
@@ -116,25 +116,51 @@
 }
 
 .add-status-draft {
-    color: var(--color-accent);
+    color: var(--color-brown);
     font-weight: 600;
 }
 
 .add-save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    background: var(--color-btn);
-    color: var(--color-btn-text);
-    border: none;
-    border-radius: 2px;
     padding: 12px;
-    font-family: var(--font-main);
-    font-size: 14px;
-    font-weight: 700;
+    background-color: #841;
+    background-image: linear-gradient(#b52 15%, #841 80%, #630);
+    border: solid 1px #500;
+    border-radius: 2pt;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+    color: #fff;
     cursor: pointer;
-    transition: opacity 0.2s;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    outline: none;
+    text-align: center;
     margin-top: 8px;
 }
 
 .add-save-btn:hover {
-    opacity: 0.85;
+    background: #a62;
+}
+
+.add-save-btn:active {
+    background: #b30;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7), 1px 1px 2px 0 rgba(0, 0, 0, 0.5) inset;
+    transform: translateY(1px);
+}
+
+.add-save-btn:focus {
+    box-shadow: 0 0 5px 1px rgba(0, 170, 255, 0.9), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+.add-page .add-input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.add-page .add-input[type="number"]::-webkit-outer-spin-button,
+.add-page .add-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }

@@ -136,10 +136,10 @@ func (r *Repository) GetStarsByParallax(parallax float64) ([]Star, error) {
 	return result, nil
 }
 
-func (r *Repository) GetStarsByParallaxRange(minP, maxP float64) ([]Star, error) {
+func (r *Repository) GetStarsByDistance(maxDistance float64) ([]Star, error) {
 	var result []Star
 	for _, s := range r.stars {
-		if s.Status != "deleted" && s.Parallax >= minP && s.Parallax <= maxP {
+		if s.Status != "deleted" && s.Distance <= maxDistance {
 			result = append(result, s)
 		}
 	}

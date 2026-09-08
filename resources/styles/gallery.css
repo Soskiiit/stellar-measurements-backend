@@ -12,7 +12,7 @@
     font-family: var(--font-main);
     font-size: 16px;
     font-weight: 700;
-    color: var(--color-accent);
+    color: var(--color-brown);
     margin-bottom: 12px;
 }
 
@@ -58,21 +58,37 @@
 }
 
 .tile-filter-btn {
-    background: var(--color-btn);
-    color: var(--color-btn-text);
-    border: none;
-    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 20px;
-    font-family: var(--font-main);
-    font-size: 14px;
-    font-weight: 700;
+    background-color: #841;
+    background-image: linear-gradient(#b52 15%, #841 80%, #630);
+    border: solid 1px #500;
+    border-radius: 2pt;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+    color: #fff;
     cursor: pointer;
-    transition: opacity 0.2s;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    outline: none;
+    text-align: center;
     white-space: nowrap;
 }
 
 .tile-filter-btn:hover {
-    opacity: 0.85;
+    background: #a62;
+}
+
+.tile-filter-btn:active {
+    background: #b30;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7), 1px 1px 2px 0 rgba(0, 0, 0, 0.5) inset;
+    transform: translateY(1px);
+}
+
+.tile-filter-btn:focus {
+    box-shadow: 0 0 5px 1px rgba(0, 170, 255, 0.9), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .tile-grid {
@@ -110,7 +126,7 @@
 }
 
 .tile-card-info {
-    background: var(--color-card-info-bg);
+    background: var(--color-beige);
     padding: 8px 11px;
     display: flex;
     justify-content: space-between;
@@ -127,7 +143,7 @@
     font-family: var(--font-main);
     font-size: 12px;
     font-weight: 700;
-    color: var(--color-accent-light);
+    color: var(--color-text);
     margin-bottom: 4px;
 }
 

@@ -49,7 +49,7 @@
     font-family: var(--font-main);
     font-size: 16px;
     font-weight: 700;
-    color: var(--color-feed-name);
+    color: var(--color-beige);
     margin-bottom: 6px;
     letter-spacing: 1px;
 }
@@ -58,7 +58,7 @@
     font-family: var(--font-main);
     font-size: 12px;
     font-weight: 400;
-    color: var(--color-feed-desc);
+    color: var(--color-primary);
     line-height: 1.5;
     margin-bottom: 8px;
     text-align: justify;
@@ -87,7 +87,7 @@
     font-family: var(--font-main);
     font-size: 12px;
     font-weight: 700;
-    color: var(--color-badge-text);
+    color: var(--color-beige);
 }
 
 .feed-actions {
@@ -106,7 +106,7 @@
 
 .feed-like-icon {
     font-size: 18px;
-    color: var(--color-feed-name);
+    color: var(--color-beige);
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -118,7 +118,7 @@
 .feed-like-count {
     font-family: var(--font-main);
     font-size: 12px;
-    color: var(--color-feed-name);
+    color: var(--color-beige);
 }
 
 .feed-next-btn {
@@ -127,17 +127,31 @@
     justify-content: center;
     width: 108px;
     height: 26px;
-    background: var(--color-btn);
-    color: var(--color-btn-text);
-    border-radius: 2px;
+    background-color: #841;
+    background-image: linear-gradient(#b52 15%, #841 80%, #630);
+    border: solid 1px #500;
+    border-radius: 2pt;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+    color: #fff;
+    cursor: pointer;
     text-decoration: none;
-    font-family: var(--font-main);
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0;
-    transition: opacity 0.2s;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    outline: none;
+    text-align: center;
 }
 
 .feed-next-btn:hover {
-    opacity: 0.85;
+    background: #a62;
+}
+
+.feed-next-btn:active {
+    background: #b30;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7), 1px 1px 2px 0 rgba(0, 0, 0, 0.5) inset;
+    transform: translateY(1px);
+}
+
+.feed-next-btn:focus {
+    box-shadow: 0 0 5px 1px rgba(0, 170, 255, 0.9), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
 }
