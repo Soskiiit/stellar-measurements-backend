@@ -126,16 +126,6 @@ func (r *Repository) GetPublishedStars() ([]Star, error) {
 	return result, nil
 }
 
-func (r *Repository) GetStarsByParallax(parallax float64) ([]Star, error) {
-	var result []Star
-	for _, s := range r.stars {
-		if s.Status != "deleted" && s.Parallax == parallax {
-			result = append(result, s)
-		}
-	}
-	return result, nil
-}
-
 func (r *Repository) GetStarsByDistance(maxDistance float64) ([]Star, error) {
 	var result []Star
 	for _, s := range r.stars {
