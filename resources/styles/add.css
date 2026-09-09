@@ -22,16 +22,6 @@
     color: var(--color-brown);
 }
 
-.add-status-badge {
-    background: var(--color-beige);
-    color: var(--color-brown);
-    font-family: var(--font-main);
-    font-size: 14px;
-    font-weight: 700;
-    padding: 4px 16px;
-    border-radius: 2px;
-}
-
 .add-section {
     background: var(--color-beige);
     border: 1px solid var(--color-card-border);
@@ -113,46 +103,6 @@
 .add-textarea {
     min-height: 67px;
     resize: vertical;
-}
-
-.add-status-draft {
-    color: var(--color-brown);
-    font-weight: 600;
-}
-
-.add-save-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 12px;
-    background-color: #841;
-    background-image: linear-gradient(#b52 15%, #841 80%, #630);
-    border: solid 1px #500;
-    border-radius: 2pt;
-    box-sizing: border-box;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
-    color: #fff;
-    cursor: pointer;
-    font-family: Verdana, Arial, sans-serif;
-    font-size: 9pt;
-    outline: none;
-    text-align: center;
-    margin-top: 8px;
-}
-
-.add-save-btn:hover {
-    background: #a62;
-}
-
-.add-save-btn:active {
-    background: #b30;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7), 1px 1px 2px 0 rgba(0, 0, 0, 0.5) inset;
-    transform: translateY(1px);
-}
-
-.add-save-btn:focus {
-    box-shadow: 0 0 5px 1px rgba(0, 170, 255, 0.9), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
 }
 
 .add-page .add-input[type="number"] {
