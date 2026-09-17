@@ -22,11 +22,23 @@ func NewHandler(r *repository.Repository) *Handler {
 
 func (h *Handler) GetFeed(ctx *gin.Context) {
 	idStr := ctx.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		logrus.Error(err)
-		ctx.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Неверный ID"})
-		return
+	var id int
+	if idStr == "" {
+		stars, err := h.Repository.GetPublishedStars()
+		if err != nil || len(stars) == 0 {
+			logrus.Error("Звёзды не найдены")
+			ctx.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Звёзды не найдены"})
+			return
+		}
+		id = stars[0].ID
+	} else {
+		var err error
+		id, err = strconv.Atoi(idStr)
+		if err != nil {
+			logrus.Error(err)
+			ctx.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Неверный ID"})
+			return
+		}
 	}
 
 	if ctx.Query("next") == "true" {
@@ -58,6 +70,10 @@ func (h *Handler) GetFeed(ctx *gin.Context) {
 		logrus.Error(err)
 		ctx.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Звезда не найдена"})
 		return
+	}
+
+	if star.Parallax > 0 {
+		star.Distance = 1.0 / star.Parallax
 	}
 
 	ctx.HTML(http.StatusOK, "feed.html", gin.H{

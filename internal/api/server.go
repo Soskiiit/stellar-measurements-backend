@@ -23,9 +23,10 @@ func StartServer() {
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/static", "./resources")
 
-	r.GET("/", h.GetTileList)
-	r.GET("/add", h.GetDraft)
+	r.GET("/", h.GetFeed)
 	r.GET("/feed/:id", h.GetFeed)
+	r.GET("/catalog", h.GetTileList)
+	r.GET("/add", h.GetDraft)
 
 	r.Run()
 	log.Println("Server down")

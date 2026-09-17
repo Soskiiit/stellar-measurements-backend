@@ -30,14 +30,73 @@
     object-fit: cover;
 }
 
+/* Floating actions on the right side of the video */
+.feed-float-actions {
+    position: absolute;
+    right: 4px;
+    bottom: 175px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 55;
+}
+
+.feed-next-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    text-decoration: none;
+}
+
+.feed-next-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    transition: transform 0.2s;
+}
+
+.feed-next-btn:hover .feed-next-icon {
+    transform: scale(1.1);
+}
+
+.feed-likes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.feed-like-icon {
+    font-size: 24px;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.feed-like-icon:hover {
+    transform: scale(1.2);
+}
+
+.feed-like-count {
+    font-family: var(--font-main);
+    font-size: 10px;
+    color: var(--color-primary);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Overlay at the bottom */
 .feed-overlay {
-    position: fixed;
-    bottom: 56px;
+    position: absolute;
+    bottom: 0;
     left: 0;
     right: 0;
     background: var(--color-overlay);
     border-top: 1px solid var(--color-overlay-border);
-    padding: 16px 17px 8px;
+    padding: 19px 17px 16px;
     z-index: 50;
 }
 
@@ -50,7 +109,7 @@
     font-size: 16px;
     font-weight: 700;
     color: var(--color-beige);
-    margin-bottom: 6px;
+    margin-bottom: 10px;
     letter-spacing: 1px;
 }
 
@@ -60,15 +119,15 @@
     font-weight: 400;
     color: var(--color-primary);
     line-height: 1.5;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
     text-align: justify;
 }
 
 .feed-fields {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 8px;
+    justify-content: flex-end;
 }
 
 .feed-field {
@@ -88,70 +147,4 @@
     font-size: 12px;
     font-weight: 700;
     color: var(--color-beige);
-}
-
-.feed-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 8px;
-    padding: 0 4px;
-}
-
-.feed-likes {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.feed-like-icon {
-    font-size: 18px;
-    color: var(--color-beige);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.feed-like-icon:hover {
-    transform: scale(1.2);
-}
-
-.feed-like-count {
-    font-family: var(--font-main);
-    font-size: 12px;
-    color: var(--color-beige);
-}
-
-.feed-next-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 108px;
-    height: 26px;
-    background-color: #841;
-    background-image: linear-gradient(#b52 15%, #841 80%, #630);
-    border: solid 1px #500;
-    border-radius: 2pt;
-    box-sizing: border-box;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
-    color: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    font-family: Verdana, Arial, sans-serif;
-    font-size: 9pt;
-    outline: none;
-    text-align: center;
-}
-
-.feed-next-btn:hover {
-    background: #a62;
-}
-
-.feed-next-btn:active {
-    background: #b30;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7), 1px 1px 2px 0 rgba(0, 0, 0, 0.5) inset;
-    transform: translateY(1px);
-}
-
-.feed-next-btn:focus {
-    box-shadow: 0 0 5px 1px rgba(0, 170, 255, 0.9), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
 }

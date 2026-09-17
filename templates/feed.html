@@ -19,6 +19,17 @@
                 <source src="{{ .star.VideoURL }}" type="video/mp4">
             </video>
         </div>
+
+        <div class="feed-float-actions">
+            <div class="feed-likes">
+                <span class="feed-like-icon">&#9825;</span>
+                <span class="feed-like-count">{{ len .star.Likes }}</span>
+            </div>
+            <a href="/feed/{{ .star.ID }}?next=true" class="feed-next-btn" title="Следующая">
+                <img src="/static/img/down-arrow.png" alt="Следующая" class="feed-next-icon">
+            </a>
+        </div>
+
         <div class="feed-overlay">
             <div class="feed-content">
                 <h1 class="feed-title">{{ .star.Name }}</h1>
@@ -31,19 +42,12 @@
                         <span class="feed-field-value">Расстояние: {{ printf "%.2f" .star.Distance }} пк</span>
                     </div>
                 </div>
-                <div class="feed-actions">
-                    <div class="feed-likes">
-                        <span class="feed-like-icon">&#9825;</span>
-                        <span class="feed-like-count">{{ len .star.Likes }}</span>
-                    </div>
-                    <a href="/feed/{{ .star.ID }}?next=true" class="feed-next-btn">Следующая &darr;</a>
-                </div>
             </div>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <a href="/feed/1" class="nav-item active">
+        <a href="/" class="nav-item active">
             <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
             <span>Лента</span>
         </a>
@@ -51,7 +55,7 @@
             <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
             <span>Добавить</span>
         </a>
-        <a href="/" class="nav-item">
+        <a href="/catalog" class="nav-item">
             <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
             <span>Каталог</span>
         </a>

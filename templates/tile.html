@@ -16,11 +16,20 @@
     <div class="tile-container">
         <h1 class="tile-header">Каталог звёзд</h1>
 
-        <form action="/" method="GET" class="tile-filter-form">
-            <div class="tile-filter-group">
-                <label class="tile-filter-label">Расстояние до, пк</label>
-                <input type="number" step="0.001" name="distance" class="tile-filter-input"
-                       placeholder="2,64" value="{{ .distance }}">
+        <form action="/catalog" method="GET" class="tile-filter-form">
+            <div class="tile-filter-slider">
+                <label class="tile-filter-label" for="distance-range">Расстояние до, пк</label>
+                <div class="tile-slider-track">
+                    <input type="range" id="distance-range" name="distance"
+                           min="0" max="1000" step="1"
+                           value="{{ if .distance }}{{ .distance }}{{ else }}1000{{ end }}"
+                           class="tile-range-input">
+                    <div class="tile-slider-ticks">
+                        <span>0</span>
+                        <span>1000</span>
+                    </div>
+                </div>
+
             </div>
             <button type="submit" class="tile-filter-btn">Поиск</button>
         </form>
@@ -47,7 +56,7 @@
     </div>
 
     <nav class="bottom-nav">
-        <a href="/feed/1" class="nav-item">
+        <a href="/" class="nav-item">
             <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
             <span>Лента</span>
         </a>
@@ -55,10 +64,11 @@
             <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
             <span>Добавить</span>
         </a>
-        <a href="/" class="nav-item active">
+        <a href="/catalog" class="nav-item active">
             <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
             <span>Каталог</span>
         </a>
     </nav>
+
 </body>
 </html>

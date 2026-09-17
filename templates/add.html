@@ -20,16 +20,16 @@
 
         <div class="add-section">
             <h2 class="add-section-title">Медиа</h2>
-            <div class="add-media-grid">
-                <label class="add-media-box" for="star-image">
-                    <img src="/static/img/image.png" alt="Фото" class="add-media-icon">
-                    <span class="add-media-label">Фото звезды</span>
-                    <input type="file" id="star-image" name="image" accept="image/*" hidden>
-                </label>
-                <label class="add-media-box" for="star-video">
+            <div class="add-media-stack">
+                <label class="add-media-strip" for="star-video">
                     <img src="/static/img/video.png" alt="Видео" class="add-media-icon">
                     <span class="add-media-label">Видео звезды</span>
                     <input type="file" id="star-video" name="video" accept="video/*" hidden>
+                </label>
+                <label class="add-media-strip" for="star-image">
+                    <img src="/static/img/image.png" alt="Фото" class="add-media-icon">
+                    <span class="add-media-label">Фото звезды</span>
+                    <input type="file" id="star-image" name="image" accept="image/*" hidden>
                 </label>
             </div>
         </div>
@@ -48,7 +48,7 @@
             </div>
 
             <div class="add-field">
-                <label class="add-label">Годовой параллакс, мас</label>
+                <label class="add-label">Годичный параллакс, мас</label>
                 <input type="number" step="0.001" name="parallax" class="add-input" placeholder="0.379">
             </div>
 
@@ -60,7 +60,7 @@
     </div>
 
     <nav class="bottom-nav">
-        <a href="/feed/1" class="nav-item">
+        <a href="/" class="nav-item">
             <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
             <span>Лента</span>
         </a>
@@ -68,7 +68,7 @@
             <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
             <span>Добавить</span>
         </a>
-        <a href="/" class="nav-item">
+        <a href="/catalog" class="nav-item">
             <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
             <span>Каталог</span>
         </a>
