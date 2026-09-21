@@ -15,7 +15,7 @@
 
     <div class="feed-container">
         <div class="feed-video-bg">
-            <video autoplay muted loop playsinline class="feed-video">
+            <video autoplay muted loop playsinline class="feed-video" poster="{{ .star.ImageURL }}">
                 <source src="{{ .star.VideoURL }}" type="video/mp4">
             </video>
         </div>

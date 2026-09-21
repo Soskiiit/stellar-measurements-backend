@@ -144,6 +144,8 @@
     transition: transform 0.2s;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    flex: 1;
 }
 
 .tile-card:hover {
@@ -154,6 +156,7 @@
     width: 100%;
     height: 155px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .tile-card-image img {
@@ -169,19 +172,27 @@
     justify-content: space-between;
     align-items: center;
     flex: 1;
+    min-height: 54px;
+    box-sizing: border-box;
 }
 
 .tile-card-details {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    flex: 1;
 }
 
 .tile-card-name {
     font-family: var(--font-main);
     font-size: 12px;
     font-weight: 700;
+    line-height: 1.25;
+    min-height: 2.5em;
     color: var(--color-text);
     margin-bottom: 4px;
+    display: flex;
+    align-items: flex-start;
 }
 
 .tile-card-meta {
@@ -203,3 +214,41 @@
 .tile-card-like-icon {
     font-size: 14px;
 }
+
+.tile-card-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tile-delete-form {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 10;
+}
+
+.tile-delete-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.tile-delete-btn:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+    transform: scale(1.1);
+}
+

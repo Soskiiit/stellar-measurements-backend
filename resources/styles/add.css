@@ -113,3 +113,34 @@
     -webkit-appearance: none;
     margin: 0;
 }
+
+.add-submit-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    margin-top: 16px;
+    background-color: #841;
+    background-image: linear-gradient(#b52 15%, #841 80%, #630);
+    border: solid 1px #500;
+    border-radius: 3px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+    color: #fff;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.add-submit-btn:hover {
+    background: #a62;
+}
+
+.add-submit-btn:active {
+    background: #b30;
+    transform: translateY(1px);
+}
+
