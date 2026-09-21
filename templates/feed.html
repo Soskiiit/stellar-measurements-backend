@@ -32,8 +32,14 @@
 
         <div class="feed-overlay">
             <div class="feed-content">
-                <h1 class="feed-title">{{ .star.Name }}</h1>
-                <p class="feed-description">{{ .star.Description }}</p>
+                <h1 class="feed-title" title="{{ .star.Name }}">{{ .star.Name }}</h1>
+                {{ if .star.Description }}
+                <div class="feed-desc-wrapper">
+                    <input type="checkbox" id="feed-desc-toggle" class="feed-desc-checkbox" hidden>
+                    <p class="feed-description">{{ .star.Description }}</p>
+                    <label for="feed-desc-toggle" class="feed-desc-toggle-btn"></label>
+                </div>
+                {{ end }}
                 <div class="feed-fields">
                     <div class="feed-field">
                         <span class="feed-field-value">Параллакс: {{ printf "%.3f" .star.Parallax }}"</span>

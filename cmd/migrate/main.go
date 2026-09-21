@@ -34,6 +34,17 @@ func main() {
 		logrus.Fatalf("Cannot migrate DB: %v", err)
 	}
 
+	// Явное приведение типов колонок при наличии существующих данных
+	db.Exec("ALTER TABLE stars ALTER COLUMN description TYPE varchar(255);")
+	db.Exec("ALTER TABLE stars ALTER COLUMN parallax TYPE numeric(4,3) USING parallax::numeric(4,3);")
+	db.Exec("ALTER TABLE stars ALTER COLUMN distance TYPE numeric(5,2) USING distance::numeric(5,2);")
+
+	// Ограничения целостности на неотрицательные значения (CHECK constraints)
+	db.Exec("ALTER TABLE stars DROP CONSTRAINT IF EXISTS chk_stars_parallax_non_negative;")
+	db.Exec("ALTER TABLE stars ADD CONSTRAINT chk_stars_parallax_non_negative CHECK (parallax >= 0);")
+	db.Exec("ALTER TABLE stars DROP CONSTRAINT IF EXISTS chk_stars_distance_non_negative;")
+	db.Exec("ALTER TABLE stars ADD CONSTRAINT chk_stars_distance_non_negative CHECK (distance >= 0);")
+
 	// Создаём частичный уникальный индекс: не более одной услуги в статусе черновик (draft) у каждого пользователя
 	db.Exec("DROP INDEX IF EXISTS idx_stars_creator_draft;")
 	db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_stars_creator_draft ON stars (creator_id) WHERE status = 'draft';")
@@ -91,7 +102,7 @@ func seedData(db *gorm.DB) {
 			{
 				ID:          2,
 				Name:        "Бетельгейзе",
-				Parallax:    0.0045,
+				Parallax:    0.004,
 				Distance:    222.22,
 				Description: "Красный сверхгигант в созвездии Ориона. Одна из самых крупных известных звёзд. Спектральный класс M1-2.",
 				Status:      ds.StatusPublished,
@@ -130,7 +141,7 @@ func seedData(db *gorm.DB) {
 			{
 				ID:          5,
 				Name:        "Полярная звезда",
-				Parallax:    0.0076,
+				Parallax:    0.008,
 				Distance:    131.58,
 				Description: "Осьми переменная цефеида в созвездии Малой Медведицы. Указывает направление на северный полюс мира. Спектральный класс F7Ib.",
 				Status:      ds.StatusPublished,

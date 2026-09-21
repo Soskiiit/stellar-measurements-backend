@@ -46,18 +46,18 @@
                 </div>
 
                 <div class="add-field">
-                    <label class="add-label">Краткое описание</label>
-                    <textarea name="description" class="add-textarea" placeholder="Краткое описание звезды, спектральный класс, созвездие..." required>{{ .star.Description }}</textarea>
+                    <label class="add-label">Краткое описание (макс. 255 символов)</label>
+                    <textarea name="description" class="add-textarea" placeholder="Краткое описание звезды, спектральный класс, созвездие..." maxlength="255" required>{{ .star.Description }}</textarea>
                 </div>
 
                 <div class="add-field">
-                    <label class="add-label">Годичный параллакс, мас</label>
-                    <input type="number" step="0.0001" name="parallax" class="add-input" placeholder="0.379" value="{{ if gt .star.Parallax 0.0 }}{{ .star.Parallax }}{{ end }}" required>
+                    <label class="add-label">Годичный параллакс, мас (от 0.001 до 9.999)</label>
+                    <input type="number" step="0.001" min="0.001" max="9.999" name="parallax" class="add-input" placeholder="0.379" value="{{ if gt .star.Parallax 0.0 }}{{ .star.Parallax }}{{ end }}" required>
                 </div>
 
                 <div class="add-field">
-                    <label class="add-label">Расстояние, пк</label>
-                    <input type="number" step="0.01" name="distance" class="add-input" placeholder="2.64" value="{{ if gt .star.Distance 0.0 }}{{ .star.Distance }}{{ end }}" required>
+                    <label class="add-label">Расстояние, пк (от 0.01 до 999.99)</label>
+                    <input type="number" step="0.01" min="0.01" max="999.99" name="distance" class="add-input" placeholder="2.64" value="{{ if gt .star.Distance 0.0 }}{{ .star.Distance }}{{ end }}" required>
                 </div>
 
                 <button type="submit" class="add-submit-btn">Опубликовать</button>
@@ -91,8 +91,8 @@
                 <h2 class="add-section-title">О звезде</h2>
 
                 <div class="add-field">
-                    <label class="add-label">Название звезды</label>
-                    <input type="text" name="name" class="add-input" placeholder="Например: Сириус" required>
+                    <label class="add-label">Название звезды (макс. 100 символов)</label>
+                    <input type="text" name="name" class="add-input" placeholder="Например: Сириус" maxlength="100" required>
                 </div>
 
                 <button type="submit" class="add-submit-btn">Далее</button>

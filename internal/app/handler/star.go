@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -109,9 +111,13 @@ func (h *Handler) GetDraft(ctx *gin.Context) {
 // Создаёт услугу в статусе черновик, если её ещё нет у пользователя.
 func (h *Handler) CreateDraft(ctx *gin.Context) {
 	const currentUserID = 1
-	name := ctx.PostForm("name")
+	name := strings.TrimSpace(ctx.PostForm("name"))
 	if name == "" {
 		name = "Новая звезда"
+	}
+	if len([]rune(name)) > 100 {
+		h.errorHandler(ctx, http.StatusBadRequest, "Длина названия звезды не может превышать 100 символов")
+		return
 	}
 
 	existingDraft, _ := h.Repository.GetDraftByCreator(currentUserID)
@@ -136,7 +142,11 @@ func (h *Handler) PublishStar(ctx *gin.Context) {
 	starIDStr := ctx.PostForm("star_id")
 	var starID uint
 	if starIDStr != "" {
-		id, _ := strconv.Atoi(starIDStr)
+		id, err := strconv.Atoi(starIDStr)
+		if err != nil {
+			h.errorHandler(ctx, http.StatusBadRequest, "Неверный ID звезды")
+			return
+		}
 		starID = uint(id)
 	} else {
 		draft, err := h.Repository.GetDraftByCreator(currentUserID)
@@ -147,18 +157,43 @@ func (h *Handler) PublishStar(ctx *gin.Context) {
 		starID = draft.ID
 	}
 
-	description := ctx.PostForm("description")
+	description := strings.TrimSpace(ctx.PostForm("description"))
+	if len([]rune(description)) > 255 {
+		h.errorHandler(ctx, http.StatusBadRequest, "Длина описания не может превышать 255 символов")
+		return
+	}
+
 	parallaxStr := ctx.PostForm("parallax")
 	distanceStr := ctx.PostForm("distance")
 
-	parallax, _ := strconv.ParseFloat(parallaxStr, 64)
-	distance, _ := strconv.ParseFloat(distanceStr, 64)
+	parallax, err := strconv.ParseFloat(parallaxStr, 64)
+	if err != nil || parallax < 0.001 || parallax > 9.999 {
+		h.errorHandler(ctx, http.StatusBadRequest, "Годичный параллакс должен быть в диапазоне от 0.001 до 9.999")
+		return
+	}
+	parallax = math.Round(parallax*1000) / 1000
+
+	var distance float64
+	if distanceStr != "" {
+		d, parseErr := strconv.ParseFloat(distanceStr, 64)
+		if parseErr != nil {
+			h.errorHandler(ctx, http.StatusBadRequest, "Некорректное значение расстояния")
+			return
+		}
+		distance = d
+	}
 
 	if distance == 0 && parallax > 0 {
 		distance = 1.0 / parallax
 	}
+	distance = math.Round(distance*100) / 100
 
-	err := h.Repository.PublishStar(starID, description, parallax, distance)
+	if distance < 0.01 || distance > 999.99 {
+		h.errorHandler(ctx, http.StatusBadRequest, "Расстояние должно быть в диапазоне от 0.01 до 999.99")
+		return
+	}
+
+	err = h.Repository.PublishStar(starID, description, parallax, distance)
 	if err != nil {
 		logrus.Error("Ошибка публикации карточки: ", err)
 		h.errorHandler(ctx, http.StatusInternalServerError, "Не удалось опубликовать звезду")
