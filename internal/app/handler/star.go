@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"stellar-measurements-backend/internal/app/ds"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"stellar-measurements-backend/internal/app/ds"
 )
 
 const DefaultImageURL = "/static/img/star_default_404.jpg"
