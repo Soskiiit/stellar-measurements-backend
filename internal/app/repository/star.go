@@ -24,6 +24,51 @@ func (r *Repository) GetPublishedStars() ([]ds.Star, error) {
 	return stars, nil
 }
 
+// GetFirstPublishedStar возвращает первую опубликованную звезду через ORM
+func (r *Repository) GetFirstPublishedStar() (*ds.Star, error) {
+	var star ds.Star
+	err := r.db.Preload("Likes").
+		Where("status = ?", ds.StatusPublished).
+		Order("id ASC").
+		First(&star).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &star, nil
+}
+
+// GetNextPublishedStarID возвращает ID следующей опубликованной звезды через запрос в БД.
+// Если текущая звезда последняя, циклически возвращает ID первой опубликованной звезды.
+func (r *Repository) GetNextPublishedStarID(currentID int) (uint, error) {
+	var star ds.Star
+	err := r.db.Select("id").
+		Where("status = ? AND id > ?", ds.StatusPublished, currentID).
+		Order("id ASC").
+		First(&star).Error
+
+	if err == nil {
+		return star.ID, nil
+	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err
+	}
+
+	// Зацикливание: если следующей звезды нет, берем первую опубликованную
+	err = r.db.Select("id").
+		Where("status = ?", ds.StatusPublished).
+		Order("id ASC").
+		First(&star).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return star.ID, nil
+}
+
 // GetStarsByDistance выполняет фильтрацию опубликованных звёзд по расстоянию через ORM
 func (r *Repository) GetStarsByDistance(maxDistance float64) ([]ds.Star, error) {
 	var stars []ds.Star

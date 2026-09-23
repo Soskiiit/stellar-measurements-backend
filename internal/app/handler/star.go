@@ -27,22 +27,17 @@ func populateDefaults(star *ds.Star) {
 	}
 }
 
-// 1. GetFeed (GET / и GET /feed/:id)
-// Отображает опубликованную звезду в ленте через ORM.
-// При ?next=true циклически переходит к следующей опубликованной звезде.
-// Удалённые звёзды недоступны для просмотра (возвращается 404).
 func (h *Handler) GetFeed(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	var star *ds.Star
 	var err error
 
 	if idStr == "" {
-		stars, err := h.Repository.GetPublishedStars()
-		if err != nil || len(stars) == 0 {
+		star, err = h.Repository.GetFirstPublishedStar()
+		if err != nil || star == nil {
 			h.errorHandler(ctx, http.StatusNotFound, "Опубликованные звёзды не найдены")
 			return
 		}
-		star = &stars[0]
 	} else {
 		id, parseErr := strconv.Atoi(idStr)
 		if parseErr != nil {
@@ -51,22 +46,10 @@ func (h *Handler) GetFeed(ctx *gin.Context) {
 		}
 
 		if ctx.Query("next") == "true" {
-			stars, err := h.Repository.GetPublishedStars()
-			if err != nil || len(stars) == 0 {
+			nextID, nextErr := h.Repository.GetNextPublishedStarID(id)
+			if nextErr != nil {
 				h.errorHandler(ctx, http.StatusNotFound, "Опубликованные звёзды не найдены")
 				return
-			}
-
-			nextID := stars[0].ID
-			for i, s := range stars {
-				if int(s.ID) == id {
-					if i+1 < len(stars) {
-						nextID = stars[i+1].ID
-					} else {
-						nextID = stars[0].ID
-					}
-					break
-				}
 			}
 			ctx.Redirect(http.StatusFound, "/feed/"+strconv.Itoa(int(nextID)))
 			return
@@ -86,9 +69,6 @@ func (h *Handler) GetFeed(ctx *gin.Context) {
 	})
 }
 
-// 2. GetDraft (GET /add)
-// Если черновик у пользователя есть, страница открывается с заполненными полями и кнопкой Опубликовать.
-// Если черновика нет, открывается форма создания с кнопкой Далее.
 func (h *Handler) GetDraft(ctx *gin.Context) {
 	const currentUserID = 1
 	draft, err := h.Repository.GetDraftByCreator(currentUserID)
@@ -107,9 +87,7 @@ func (h *Handler) GetDraft(ctx *gin.Context) {
 	})
 }
 
-// 3. CreateDraft (POST /stars)
 // Добавление новой карточки через ORM.
-// Создаёт услугу в статусе черновик, если её ещё нет у пользователя.
 func (h *Handler) CreateDraft(ctx *gin.Context) {
 	const currentUserID = 1
 	name := strings.TrimSpace(ctx.PostForm("name"))
@@ -134,9 +112,6 @@ func (h *Handler) CreateDraft(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/add")
 }
 
-// 4. PublishStar (POST /stars/publish)
-// Публикация карточки через ORM.
-// Заполняет краткую информацию, оба поля по теме и меняет статус на 'опубликован'.
 func (h *Handler) PublishStar(ctx *gin.Context) {
 	const currentUserID = 1
 
@@ -204,9 +179,6 @@ func (h *Handler) PublishStar(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/catalog")
 }
 
-// 5. GetCatalog (GET /catalog)
-// Список всех карточек в виде плитки через ORM.
-// Поддерживает поиск/фильтрацию по полю расстояния.
 func (h *Handler) GetCatalog(ctx *gin.Context) {
 	distanceStr := ctx.Query("distance")
 	var stars []ds.Star
@@ -237,9 +209,6 @@ func (h *Handler) GetCatalog(ctx *gin.Context) {
 	})
 }
 
-// 6. DeleteStar (POST /stars/delete)
-// Логическое удаление услуги (статус меняется на 'удален') с помощью выполнения
-// SQL запроса UPDATE через SQL курсор (без ORM).
 func (h *Handler) DeleteStar(ctx *gin.Context) {
 	starIDStr := ctx.PostForm("star_id")
 	starID, err := strconv.Atoi(starIDStr)
