@@ -87,7 +87,6 @@ func (h *Handler) GetDraft(ctx *gin.Context) {
 	})
 }
 
-// Добавление новой карточки через ORM.
 func (h *Handler) CreateDraft(ctx *gin.Context) {
 	const currentUserID = 1
 	name := strings.TrimSpace(ctx.PostForm("name"))

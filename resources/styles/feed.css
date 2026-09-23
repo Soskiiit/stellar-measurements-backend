@@ -30,7 +30,6 @@
     object-fit: cover;
 }
 
-/* Floating actions on the right side of the video */
 .feed-float-actions {
     position: absolute;
     right: 4px;
@@ -88,7 +87,6 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* Overlay at the bottom */
 .feed-overlay {
     position: absolute;
     bottom: 0;
@@ -140,8 +138,6 @@
     word-break: break-word;
     overflow-wrap: anywhere;
     text-align: left;
-
-    /* По умолчанию свернуто: не более 2 строк */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -150,7 +146,6 @@
     transition: max-height 0.3s ease;
 }
 
-/* Развернутое состояние по клику на кнопку */
 .feed-desc-checkbox:checked ~ .feed-description {
     display: block;
     max-height: 140px;

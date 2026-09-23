@@ -1,7 +1,5 @@
-/* Подклбчаем шрифты */
 @import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@400;700&display=swap');
 
-/* Цвета а переменные, ещё 100 раз красить буду :( */
 :root {
     --color-primary: #FFFFFF;
     --color-header: #630;
@@ -64,7 +62,6 @@ body {
     padding-top: 48px;
 }
 
-/* Навбар */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -107,7 +104,6 @@ body {
     opacity: 0.8;
 }
 
-/* Ошибки  */
 .error-page {
     display: flex;
     align-items: center;

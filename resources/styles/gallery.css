@@ -23,7 +23,6 @@
     align-items: flex-end;
 }
 
-/* Slider field */
 .tile-filter-slider {
     flex: 1;
     display: flex;

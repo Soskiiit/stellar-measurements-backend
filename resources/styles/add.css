@@ -40,7 +40,6 @@
     margin-bottom: 12px;
 }
 
-/* Stacked media strips instead of grid */
 .add-media-stack {
     display: flex;
     flex-direction: column;

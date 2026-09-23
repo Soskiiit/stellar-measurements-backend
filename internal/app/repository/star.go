@@ -11,7 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// GetPublishedStars возвращает все опубликованные звёзды через ORM
 func (r *Repository) GetPublishedStars() ([]ds.Star, error) {
 	var stars []ds.Star
 	err := r.db.Preload("Likes").
@@ -24,7 +23,6 @@ func (r *Repository) GetPublishedStars() ([]ds.Star, error) {
 	return stars, nil
 }
 
-// GetFirstPublishedStar возвращает первую опубликованную звезду через ORM
 func (r *Repository) GetFirstPublishedStar() (*ds.Star, error) {
 	var star ds.Star
 	err := r.db.Preload("Likes").
@@ -40,8 +38,6 @@ func (r *Repository) GetFirstPublishedStar() (*ds.Star, error) {
 	return &star, nil
 }
 
-// GetNextPublishedStarID возвращает ID следующей опубликованной звезды через запрос в БД.
-// Если текущая звезда последняя, циклически возвращает ID первой опубликованной звезды.
 func (r *Repository) GetNextPublishedStarID(currentID int) (uint, error) {
 	var star ds.Star
 	err := r.db.Select("id").
@@ -57,7 +53,6 @@ func (r *Repository) GetNextPublishedStarID(currentID int) (uint, error) {
 		return 0, err
 	}
 
-	// Зацикливание: если следующей звезды нет, берем первую опубликованную
 	err = r.db.Select("id").
 		Where("status = ?", ds.StatusPublished).
 		Order("id ASC").
@@ -69,7 +64,6 @@ func (r *Repository) GetNextPublishedStarID(currentID int) (uint, error) {
 	return star.ID, nil
 }
 
-// GetStarsByDistance выполняет фильтрацию опубликованных звёзд по расстоянию через ORM
 func (r *Repository) GetStarsByDistance(maxDistance float64) ([]ds.Star, error) {
 	var stars []ds.Star
 	err := r.db.Preload("Likes").
@@ -82,8 +76,6 @@ func (r *Repository) GetStarsByDistance(maxDistance float64) ([]ds.Star, error) 
 	return stars, nil
 }
 
-// GetStarByID возвращает опубликованную звезду по ID через ORM.
-// Удалённые звёзды и черновики через этот метод недоступны для просмотра.
 func (r *Repository) GetStarByID(id int) (*ds.Star, error) {
 	var star ds.Star
 	err := r.db.Preload("Likes").
@@ -95,7 +87,6 @@ func (r *Repository) GetStarByID(id int) (*ds.Star, error) {
 	return &star, nil
 }
 
-// GetStarByIDCursor демонстрирует получение записи через курсор (Raw SQL)
 func (r *Repository) GetStarByIDCursor(id int) (*ds.Star, error) {
 	query := "SELECT id, name, description, status, image_url, video_url, parallax, distance, date_create, creator_id FROM stars WHERE id = $1 AND status = 'published'"
 	row := r.db.Raw(query, id).Row()
@@ -122,7 +113,6 @@ func (r *Repository) GetStarByIDCursor(id int) (*ds.Star, error) {
 	return &star, nil
 }
 
-// GetDraftByCreator находит черновик конкретного пользователя через ORM
 func (r *Repository) GetDraftByCreator(creatorID uint) (*ds.Star, error) {
 	var star ds.Star
 	err := r.db.Where("creator_id = ? AND status = ?", creatorID, ds.StatusDraft).First(&star).Error
@@ -135,7 +125,6 @@ func (r *Repository) GetDraftByCreator(creatorID uint) (*ds.Star, error) {
 	return &star, nil
 }
 
-// CreateDraft создаёт новую карточку в статусе 'draft' через ORM
 func (r *Repository) CreateDraft(creatorID uint, name string) (*ds.Star, error) {
 	draft := ds.Star{
 		Name:        name,
@@ -157,7 +146,6 @@ func (r *Repository) CreateDraft(creatorID uint, name string) (*ds.Star, error) 
 	return &draft, nil
 }
 
-// PublishStar публикует карточку через ORM, обновляя описание, параллакс, расстояние и дату формирования
 func (r *Repository) PublishStar(starID uint, description string, parallax float64, distance float64) error {
 	now := time.Now()
 	updates := map[string]interface{}{
@@ -176,7 +164,6 @@ func (r *Repository) PublishStar(starID uint, description string, parallax float
 	return nil
 }
 
-// DeleteStar выполняет логическое удаление услуги (статус меняется на 'deleted')
 func (r *Repository) DeleteStar(starID uint) error {
 	query := "UPDATE stars SET status = $1 WHERE id = $2 RETURNING id"
 
