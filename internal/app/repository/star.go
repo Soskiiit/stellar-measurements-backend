@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"gorm.io/gorm"
 	"stellar-measurements-backend/internal/app/ds"
+
+	"gorm.io/gorm"
 )
 
 // GetPublishedStars возвращает все опубликованные звёзды через ORM
@@ -131,12 +132,23 @@ func (r *Repository) PublishStar(starID uint, description string, parallax float
 }
 
 // DeleteStar выполняет логическое удаление услуги (статус меняется на 'deleted')
-// с помощью выполнения SQL запроса UPDATE, БЕЗ ORM.
 func (r *Repository) DeleteStar(starID uint) error {
-	query := "UPDATE stars SET status = $1 WHERE id = $2"
-	result := r.db.Exec(query, ds.StatusDeleted, starID)
-	if result.Error != nil {
-		return fmt.Errorf("ошибка при удалении звезды с id %d: %w", starID, result.Error)
+	query := "UPDATE stars SET status = $1 WHERE id = $2 RETURNING id"
+
+	rows, err := r.db.Raw(query, ds.StatusDeleted, starID).Rows()
+	if err != nil {
+		return fmt.Errorf("ошибка открытия курсора при удалении звезды с id %d: %w", starID, err)
 	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return fmt.Errorf("звезда с id %d не найдена", starID)
+	}
+
+	var deletedID uint
+	if err := rows.Scan(&deletedID); err != nil {
+		return fmt.Errorf("ошибка чтения из SQL курсора: %w", err)
+	}
+
 	return nil
 }

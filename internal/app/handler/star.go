@@ -238,7 +238,7 @@ func (h *Handler) GetCatalog(ctx *gin.Context) {
 
 // 6. DeleteStar (POST /stars/delete)
 // Логическое удаление услуги (статус меняется на 'удален') с помощью выполнения
-// SQL запроса UPDATE, БЕЗ ORM.
+// SQL запроса UPDATE через SQL курсор (без ORM).
 func (h *Handler) DeleteStar(ctx *gin.Context) {
 	starIDStr := ctx.PostForm("star_id")
 	starID, err := strconv.Atoi(starIDStr)
