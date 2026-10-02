@@ -243,25 +243,39 @@
 }
 
 .tile-delete-btn {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.65);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: bold;
-    line-height: 1;
-    transition: background 0.2s, transform 0.1s;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    background-color: #841;
+    background-image: linear-gradient(#b52 15%, #841 80%, #630);
+    border: solid 1px #500;
+    border-radius: 2pt;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+    color: #fff;
+    cursor: pointer;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 9pt;
+    outline: none;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .tile-delete-btn:hover {
-    background: #c0392b;
-    border-color: #c0392b;
-    transform: scale(1.1);
+    background: #a62;
 }
+
+.tile-delete-btn:active {
+    background: #b30;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.7), 1px 1px 2px 0 rgba(0, 0, 0, 0.5) inset;
+    transform: translateY(1px);
+}
+
+.tile-delete-btn:focus {
+    box-shadow: 0 0 5px 1px rgba(0, 170, 255, 0.9), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
 

@@ -26,24 +26,24 @@ func main() {
 
 	err = db.AutoMigrate(
 		&ds.User{},
-		&ds.Star{},
-		&ds.StarLike{},
+		&ds.ParallaxStar{},
+		&ds.ParallaxStarLike{},
 	)
 	if err != nil {
 		logrus.Fatalf("Cannot migrate DB: %v", err)
 	}
 
-	db.Exec("ALTER TABLE stars ALTER COLUMN description TYPE varchar(255);")
-	db.Exec("ALTER TABLE stars ALTER COLUMN parallax TYPE numeric(4,3) USING parallax::numeric(4,3);")
-	db.Exec("ALTER TABLE stars ALTER COLUMN distance TYPE numeric(5,2) USING distance::numeric(5,2);")
+	db.Exec("ALTER TABLE parallax_stars ALTER COLUMN description TYPE varchar(255);")
+	db.Exec("ALTER TABLE parallax_stars ALTER COLUMN parallax TYPE numeric(4,3) USING parallax::numeric(4,3);")
+	db.Exec("ALTER TABLE parallax_stars ALTER COLUMN distance TYPE numeric(5,2) USING distance::numeric(5,2);")
 
-	db.Exec("ALTER TABLE stars DROP CONSTRAINT IF EXISTS chk_stars_parallax_non_negative;")
-	db.Exec("ALTER TABLE stars ADD CONSTRAINT chk_stars_parallax_non_negative CHECK (parallax >= 0);")
-	db.Exec("ALTER TABLE stars DROP CONSTRAINT IF EXISTS chk_stars_distance_non_negative;")
-	db.Exec("ALTER TABLE stars ADD CONSTRAINT chk_stars_distance_non_negative CHECK (distance >= 0);")
+	db.Exec("ALTER TABLE parallax_stars DROP CONSTRAINT IF EXISTS chk_parallax_stars_parallax_non_negative;")
+	db.Exec("ALTER TABLE parallax_stars ADD CONSTRAINT chk_parallax_stars_parallax_non_negative CHECK (parallax >= 0);")
+	db.Exec("ALTER TABLE parallax_stars DROP CONSTRAINT IF EXISTS chk_parallax_stars_distance_non_negative;")
+	db.Exec("ALTER TABLE parallax_stars ADD CONSTRAINT chk_parallax_stars_distance_non_negative CHECK (distance >= 0);")
 
-	db.Exec("DROP INDEX IF EXISTS idx_stars_creator_draft;")
-	db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_stars_creator_draft ON stars (creator_id) WHERE status = 'draft';")
+	db.Exec("DROP INDEX IF EXISTS idx_parallax_stars_creator_draft;")
+	db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_parallax_stars_creator_draft ON parallax_stars (creator_id) WHERE status = 'draft';")
 
 	logrus.Info("Database schema migrated successfully")
 
@@ -74,12 +74,23 @@ func seedData(db *gorm.DB) {
 	}
 
 	var starCount int64
-	db.Model(&ds.Star{}).Count(&starCount)
+	db.Model(&ds.ParallaxStar{}).Count(&starCount)
+	if starCount == 0 {
+		var legacyStarsExist int64
+		_ = db.Raw("SELECT count(*) FROM information_schema.tables WHERE table_name = 'stars'").Scan(&legacyStarsExist)
+		if legacyStarsExist > 0 {
+			db.Exec(`INSERT INTO parallax_stars (id, name, description, status, image_url, video_url, parallax, distance, date_create, date_finish, creator_id)
+				SELECT id, name, description, status, image_url, video_url, parallax, distance, date_create, date_finish, creator_id FROM stars ORDER BY id ON CONFLICT DO NOTHING;`)
+			db.Exec("SELECT setval('parallax_stars_id_seq', (SELECT COALESCE(MAX(id), 1) FROM parallax_stars));")
+			db.Model(&ds.ParallaxStar{}).Count(&starCount)
+		}
+	}
+
 	if starCount == 0 {
 		now := time.Now()
 		past := now.Add(-48 * time.Hour)
 
-		stars := []ds.Star{
+		stars := []ds.ParallaxStar{
 			{
 				ID:          1,
 				Name:        "Проксима Центавра",
@@ -87,8 +98,8 @@ func seedData(db *gorm.DB) {
 				Distance:    1.30,
 				Description: "Ближайшая к Солнцу звезда. Красный карлик спектрального класса M5.5V. Часть тройной системы Альфа Центавра.",
 				Status:      ds.StatusPublished,
-				ImageURL:    "http://localhost:9002/stars/Proxima%20Centauri.jpg",
-				VideoURL:    "http://localhost:9002/stars/Proxima%20Centauri.mp4",
+				ImageURL:    "http://localhost:9002/parallax_stars/Proxima%20Centauri.jpg",
+				VideoURL:    "http://localhost:9002/parallax_stars/Proxima%20Centauri.mp4",
 				DateCreate:  past,
 				DateFinish:  sql.NullTime{Time: past.Add(time.Hour), Valid: true},
 				CreatorID:   1,
@@ -100,8 +111,8 @@ func seedData(db *gorm.DB) {
 				Distance:    222.22,
 				Description: "Красный сверхгигант в созвездии Ориона. Одна из самых крупных известных звёзд. Спектральный класс M1-2.",
 				Status:      ds.StatusPublished,
-				ImageURL:    "http://localhost:9002/stars/Betelgeuse.jpg",
-				VideoURL:    "http://localhost:9002/stars/Betelgeuse.mp4",
+				ImageURL:    "http://localhost:9002/parallax_stars/Betelgeuse.jpg",
+				VideoURL:    "http://localhost:9002/parallax_stars/Betelgeuse.mp4",
 				DateCreate:  past,
 				DateFinish:  sql.NullTime{Time: past.Add(2 * time.Hour), Valid: true},
 				CreatorID:   1,
@@ -113,8 +124,8 @@ func seedData(db *gorm.DB) {
 				Distance:    1.33,
 				Description: "Главная звезда тройной системы Альфа Центавра. Спектральный класс G2V, аналог Солнца. Расстояние около 4.37 световых лет.",
 				Status:      ds.StatusPublished,
-				ImageURL:    "http://localhost:9002/stars/AlphaCentauri.jpg",
-				VideoURL:    "http://localhost:9002/stars/AlphaCentauri.mp4",
+				ImageURL:    "http://localhost:9002/parallax_stars/AlphaCentauri.jpg",
+				VideoURL:    "http://localhost:9002/parallax_stars/AlphaCentauri.mp4",
 				DateCreate:  past,
 				DateFinish:  sql.NullTime{Time: past.Add(3 * time.Hour), Valid: true},
 				CreatorID:   1,
@@ -126,8 +137,8 @@ func seedData(db *gorm.DB) {
 				Distance:    7.68,
 				Description: "Ярчайшая звезда созвездия Лиры. Спектральный класс A0V. Используется как стандарт нуля цветности.",
 				Status:      ds.StatusDraft,
-				ImageURL:    "http://localhost:9002/stars/Vega.jpg",
-				VideoURL:    "http://localhost:9002/stars/Vega.mp4",
+				ImageURL:    "http://localhost:9002/parallax_stars/Vega.jpg",
+				VideoURL:    "http://localhost:9002/parallax_stars/Vega.mp4",
 				DateCreate:  now,
 				DateFinish:  sql.NullTime{Valid: false},
 				CreatorID:   1,
@@ -139,8 +150,8 @@ func seedData(db *gorm.DB) {
 				Distance:    131.58,
 				Description: "Осьми переменная цефеида в созвездии Малой Медведицы. Указывает направление на северный полюс мира. Спектральный класс F7Ib.",
 				Status:      ds.StatusPublished,
-				ImageURL:    "http://localhost:9002/stars/Polaris.jpg",
-				VideoURL:    "http://localhost:9002/stars/Polaris.mp4",
+				ImageURL:    "http://localhost:9002/parallax_stars/Polaris.jpg",
+				VideoURL:    "http://localhost:9002/parallax_stars/Polaris.mp4",
 				DateCreate:  past,
 				DateFinish:  sql.NullTime{Time: past.Add(4 * time.Hour), Valid: true},
 				CreatorID:   2,
@@ -152,8 +163,8 @@ func seedData(db *gorm.DB) {
 				Distance:    5.03,
 				Description: "Звезда в созвездии Орла. Спектральный класс A7V. Быстро вращается вокруг оси. Одна из ближайших видимых невооружённым глазом звёзд.",
 				Status:      ds.StatusDeleted,
-				ImageURL:    "http://localhost:9002/stars/Altair.jpg",
-				VideoURL:    "http://localhost:9002/stars/Altair.mp4",
+				ImageURL:    "http://localhost:9002/parallax_stars/Altair.jpg",
+				VideoURL:    "http://localhost:9002/parallax_stars/Altair.mp4",
 				DateCreate:  past,
 				DateFinish:  sql.NullTime{Time: past.Add(5 * time.Hour), Valid: true},
 				CreatorID:   1,
@@ -165,34 +176,45 @@ func seedData(db *gorm.DB) {
 		} else {
 			logrus.Info("Stars seeded successfully")
 		}
-		db.Exec("SELECT setval('stars_id_seq', (SELECT MAX(id) FROM stars));")
+		db.Exec("SELECT setval('parallax_stars_id_seq', (SELECT MAX(id) FROM parallax_stars));")
 	}
 
 	var likeCount int64
-	db.Model(&ds.StarLike{}).Count(&likeCount)
+	db.Model(&ds.ParallaxStarLike{}).Count(&likeCount)
 	if likeCount == 0 {
-		likes := []ds.StarLike{
-			{ID: 1, UserID: 1, StarID: 1},
-			{ID: 2, UserID: 4, StarID: 1},
+		var legacyLikesExist int64
+		_ = db.Raw("SELECT count(*) FROM information_schema.tables WHERE table_name = 'star_likes'").Scan(&legacyLikesExist)
+		if legacyLikesExist > 0 {
+			db.Exec(`INSERT INTO parallax_star_likes (id, user_id, parallax_star_id)
+				SELECT id, user_id, star_id FROM star_likes ORDER BY id ON CONFLICT DO NOTHING;`)
+			db.Exec("SELECT setval('parallax_star_likes_id_seq', (SELECT COALESCE(MAX(id), 1) FROM parallax_star_likes));")
+			db.Model(&ds.ParallaxStarLike{}).Count(&likeCount)
+		}
+	}
 
-			{ID: 3, UserID: 2, StarID: 2},
-			{ID: 4, UserID: 5, StarID: 2},
-			{ID: 5, UserID: 6, StarID: 2},
+	if likeCount == 0 {
+		likes := []ds.ParallaxStarLike{
+			{ID: 1, UserID: 1, ParallaxStarID: 1},
+			{ID: 2, UserID: 4, ParallaxStarID: 1},
 
-			{ID: 6, UserID: 1, StarID: 3},
-			{ID: 7, UserID: 2, StarID: 3},
+			{ID: 3, UserID: 2, ParallaxStarID: 2},
+			{ID: 4, UserID: 5, ParallaxStarID: 2},
+			{ID: 5, UserID: 6, ParallaxStarID: 2},
 
-			{ID: 8, UserID: 3, StarID: 5},
-			{ID: 9, UserID: 7, StarID: 5},
-			{ID: 10, UserID: 8, StarID: 5},
-			{ID: 11, UserID: 9, StarID: 5},
+			{ID: 6, UserID: 1, ParallaxStarID: 3},
+			{ID: 7, UserID: 2, ParallaxStarID: 3},
+
+			{ID: 8, UserID: 3, ParallaxStarID: 5},
+			{ID: 9, UserID: 7, ParallaxStarID: 5},
+			{ID: 10, UserID: 8, ParallaxStarID: 5},
+			{ID: 11, UserID: 9, ParallaxStarID: 5},
 		}
 		if err := db.Create(&likes).Error; err != nil {
 			logrus.Errorf("Error seeding star likes: %v", err)
 		} else {
 			logrus.Info("Star likes seeded successfully")
 		}
-		db.Exec("SELECT setval('star_likes_id_seq', (SELECT MAX(id) FROM star_likes));")
+		db.Exec("SELECT setval('parallax_star_likes_id_seq', (SELECT MAX(id) FROM parallax_star_likes));")
 	}
 
 	fmt.Println("Database migration and initial seed completed.")

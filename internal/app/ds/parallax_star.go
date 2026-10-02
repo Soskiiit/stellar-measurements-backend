@@ -11,7 +11,7 @@ const (
 	StatusDeleted   = "deleted"
 )
 
-type Star struct {
+type ParallaxStar struct {
 	ID          uint         `gorm:"primaryKey" json:"id"`
 	Name        string       `gorm:"type:varchar(100);not null" json:"name"`
 	Description string       `gorm:"type:varchar(255);default:''" json:"description"`
@@ -24,10 +24,12 @@ type Star struct {
 	DateFinish  sql.NullTime `gorm:"default:null" json:"date_finish"`
 	CreatorID   uint         `gorm:"not null" json:"creator_id"`
 
-	Creator User       `gorm:"foreignKey:CreatorID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"creator,omitempty"`
-	Likes   []StarLike `gorm:"foreignKey:StarID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"likes,omitempty"`
+	Creator User               `gorm:"foreignKey:CreatorID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"creator,omitempty"`
+	Likes   []ParallaxStarLike `gorm:"foreignKey:ParallaxStarID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;" json:"likes,omitempty"`
 }
 
-func (Star) TableName() string {
-	return "stars"
+func (ParallaxStar) TableName() string {
+	return "parallax_stars"
 }
+
+type Star = ParallaxStar

@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#643918">
     <title>{{ .star.Name }} — Звёздные измерения</title>
     <link rel="stylesheet" href="/static/styles/main.css">
-    <link rel="stylesheet" href="/static/styles/feed.css">
+    <link rel="stylesheet" href="/static/styles/parallax_stars_feed.css">
 </head>
 <body class="feed-page">
     <header class="header">
@@ -25,7 +25,7 @@
                 <span class="feed-like-icon">&#9825;</span>
                 <span class="feed-like-count">{{ len .star.Likes }}</span>
             </div>
-            <a href="/feed/{{ .star.ID }}?next=true" class="feed-next-btn" title="Следующая">
+            <a href="/parallax_stars_feed/{{ .star.ID }}?next=true" class="feed-next-btn" title="Следующая">
                 <img src="/static/img/down-arrow.png" alt="Следующая" class="feed-next-icon">
             </a>
         </div>
@@ -57,11 +57,11 @@
             <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
             <span>Лента</span>
         </a>
-        <a href="/add" class="nav-item">
+        <a href="/add_parallax_star" class="nav-item">
             <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
             <span>Добавить</span>
         </a>
-        <a href="/catalog" class="nav-item">
+        <a href="/parallax_stars_catalog" class="nav-item">
             <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
             <span>Каталог</span>
         </a>

@@ -12,10 +12,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const DefaultImageURL = "/static/img/star_default_404.jpg"
-const DefaultVideoURL = "/static/videos/star_default.mp4"
+const DefaultImageURL = "/static/img/parallax_star_default_404.jpg"
+const DefaultVideoURL = "/static/videos/parallax_star_default.mp4"
 
-func populateDefaults(star *ds.Star) {
+func populateDefaults(star *ds.ParallaxStar) {
 	if star.ImageURL == "" {
 		star.ImageURL = DefaultImageURL
 	}
@@ -29,11 +29,11 @@ func populateDefaults(star *ds.Star) {
 
 func (h *Handler) GetFeed(ctx *gin.Context) {
 	idStr := ctx.Param("id")
-	var star *ds.Star
+	var star *ds.ParallaxStar
 	var err error
 
 	if idStr == "" {
-		star, err = h.Repository.GetFirstPublishedStar()
+		star, err = h.Repository.GetFirstPublishedParallaxStar()
 		if err != nil || star == nil {
 			h.errorHandler(ctx, http.StatusNotFound, "Опубликованные звёзды не найдены")
 			return
@@ -46,16 +46,16 @@ func (h *Handler) GetFeed(ctx *gin.Context) {
 		}
 
 		if ctx.Query("next") == "true" {
-			nextID, nextErr := h.Repository.GetNextPublishedStarID(id)
+			nextID, nextErr := h.Repository.GetNextPublishedParallaxStarID(id)
 			if nextErr != nil {
 				h.errorHandler(ctx, http.StatusNotFound, "Опубликованные звёзды не найдены")
 				return
 			}
-			ctx.Redirect(http.StatusFound, "/feed/"+strconv.Itoa(int(nextID)))
+			ctx.Redirect(http.StatusFound, "/parallax_stars_feed/"+strconv.Itoa(int(nextID)))
 			return
 		}
 
-		star, err = h.Repository.GetStarByID(id)
+		star, err = h.Repository.GetParallaxStarByID(id)
 		if err != nil || star == nil {
 			h.errorHandler(ctx, http.StatusNotFound, "Звезда не найдена или удалена")
 			return
@@ -64,8 +64,9 @@ func (h *Handler) GetFeed(ctx *gin.Context) {
 
 	populateDefaults(star)
 
-	ctx.HTML(http.StatusOK, "feed.html", gin.H{
-		"star": star,
+	ctx.HTML(http.StatusOK, "parallax_stars_feed.html", gin.H{
+		"star":          star,
+		"parallax_star": star,
 	})
 }
 
@@ -81,9 +82,10 @@ func (h *Handler) GetDraft(ctx *gin.Context) {
 		populateDefaults(draft)
 	}
 
-	ctx.HTML(http.StatusOK, "add.html", gin.H{
-		"hasDraft": hasDraft,
-		"star":     draft,
+	ctx.HTML(http.StatusOK, "parallax_stars_add.html", gin.H{
+		"hasDraft":      hasDraft,
+		"star":          draft,
+		"parallax_star": draft,
 	})
 }
 
@@ -108,13 +110,17 @@ func (h *Handler) CreateDraft(ctx *gin.Context) {
 		}
 	}
 
-	ctx.Redirect(http.StatusFound, "/add")
+	ctx.Redirect(http.StatusFound, "/add_parallax_star")
 }
 
 func (h *Handler) PublishStar(ctx *gin.Context) {
 	const currentUserID = 1
 
-	starIDStr := ctx.PostForm("star_id")
+	starIDStr := ctx.PostForm("parallax_star_id")
+	if starIDStr == "" {
+		starIDStr = ctx.PostForm("star_id")
+	}
+
 	var starID uint
 	if starIDStr != "" {
 		id, err := strconv.Atoi(starIDStr)
@@ -168,30 +174,30 @@ func (h *Handler) PublishStar(ctx *gin.Context) {
 		return
 	}
 
-	err = h.Repository.PublishStar(starID, description, parallax, distance)
+	err = h.Repository.PublishParallaxStar(starID, description, parallax, distance)
 	if err != nil {
 		logrus.Error("Ошибка публикации карточки: ", err)
 		h.errorHandler(ctx, http.StatusInternalServerError, "Не удалось опубликовать звезду")
 		return
 	}
 
-	ctx.Redirect(http.StatusFound, "/catalog")
+	ctx.Redirect(http.StatusFound, "/parallax_stars_catalog")
 }
 
 func (h *Handler) GetCatalog(ctx *gin.Context) {
 	distanceStr := ctx.Query("distance")
-	var stars []ds.Star
+	var stars []ds.ParallaxStar
 	var err error
 
 	if distanceStr == "" {
-		stars, err = h.Repository.GetPublishedStars()
+		stars, err = h.Repository.GetPublishedParallaxStars()
 	} else {
 		distance, parseErr := strconv.ParseFloat(distanceStr, 64)
 		if parseErr != nil {
 			h.errorHandler(ctx, http.StatusBadRequest, "Неверное значение фильтра расстояния")
 			return
 		}
-		stars, err = h.Repository.GetStarsByDistance(distance)
+		stars, err = h.Repository.GetParallaxStarsByDistance(distance)
 	}
 
 	if err != nil {
@@ -202,26 +208,31 @@ func (h *Handler) GetCatalog(ctx *gin.Context) {
 		populateDefaults(&stars[i])
 	}
 
-	ctx.HTML(http.StatusOK, "tile.html", gin.H{
-		"stars":    stars,
-		"distance": distanceStr,
+	ctx.HTML(http.StatusOK, "parallax_stars_catalog.html", gin.H{
+		"stars":          stars,
+		"parallax_stars": stars,
+		"distance":       distanceStr,
 	})
 }
 
 func (h *Handler) DeleteStar(ctx *gin.Context) {
-	starIDStr := ctx.PostForm("star_id")
+	starIDStr := ctx.PostForm("parallax_star_id")
+	if starIDStr == "" {
+		starIDStr = ctx.PostForm("star_id")
+	}
+
 	starID, err := strconv.Atoi(starIDStr)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, "Неверный ID звезды для удаления")
 		return
 	}
 
-	err = h.Repository.DeleteStar(uint(starID))
+	err = h.Repository.DeleteParallaxStar(uint(starID))
 	if err != nil {
 		logrus.Error("Ошибка удаления звезды: ", err)
 		h.errorHandler(ctx, http.StatusInternalServerError, "Ошибка при удалении звезды")
 		return
 	}
 
-	ctx.Redirect(http.StatusFound, "/catalog")
+	ctx.Redirect(http.StatusFound, "/parallax_stars_catalog")
 }

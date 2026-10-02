@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#643918">
     <title>Плитка — Звёздные измерения</title>
     <link rel="stylesheet" href="/static/styles/main.css">
-    <link rel="stylesheet" href="/static/styles/gallery.css">
+    <link rel="stylesheet" href="/static/styles/parallax_stars_catalog.css">
 </head>
 <body class="tile-page">
     <header class="header">
@@ -16,7 +16,7 @@
     <div class="tile-container">
         <h1 class="tile-header">Каталог звёзд</h1>
 
-        <form action="/catalog" method="GET" class="tile-filter-form">
+        <form action="/parallax_stars_catalog" method="GET" class="tile-filter-form">
             <div class="tile-filter-slider">
                 <label class="tile-filter-label" for="distance-range">Расстояние до, пк</label>
                 <div class="tile-slider-track">
@@ -37,9 +37,9 @@
         <div class="tile-grid">
             {{ range .stars }}
             <div class="tile-card-wrapper">
-                <a href="/feed/{{ .ID }}" class="tile-card">
+                <a href="/parallax_stars_feed/{{ .ID }}" class="tile-card">
                     <div class="tile-card-image">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" onerror="this.onerror=null;this.src='/static/img/star_default_404.jpg';">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" onerror="this.onerror=null;this.src='/static/img/parallax_star_default_404.jpg';">
                     </div>
                     <div class="tile-card-info">
                         <div class="tile-card-details">
@@ -52,8 +52,8 @@
                         </span>
                     </div>
                 </a>
-                <form action="/stars/delete" method="POST" class="tile-delete-form">
-                    <input type="hidden" name="star_id" value="{{ .ID }}">
+                <form action="/delete_parallax_star" method="POST" class="tile-delete-form">
+                    <input type="hidden" name="parallax_star_id" value="{{ .ID }}">
                     <button type="submit" class="tile-delete-btn" title="Удалить услугу">✕</button>
                 </form>
             </div>
@@ -66,11 +66,11 @@
             <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
             <span>Лента</span>
         </a>
-        <a href="/add" class="nav-item">
+        <a href="/add_parallax_star" class="nav-item">
             <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
             <span>Добавить</span>
         </a>
-        <a href="/catalog" class="nav-item active">
+        <a href="/parallax_stars_catalog" class="nav-item active">
             <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
             <span>Каталог</span>
         </a>

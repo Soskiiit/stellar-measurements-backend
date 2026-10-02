@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#643918">
     <title>{{ if .hasDraft }}Публикация: {{ .star.Name }}{{ else }}Новая звезда{{ end }} — Звёздные измерения</title>
     <link rel="stylesheet" href="/static/styles/main.css">
-    <link rel="stylesheet" href="/static/styles/add.css">
+    <link rel="stylesheet" href="/static/styles/parallax_stars_add.css">
 </head>
 <body class="add-page">
     <header class="header">
@@ -19,8 +19,8 @@
             <h1 class="add-header">Публикация черновика</h1>
         </div>
 
-        <form action="/stars/publish" method="POST">
-            <input type="hidden" name="star_id" value="{{ .star.ID }}">
+        <form action="/publish_parallax_star" method="POST">
+            <input type="hidden" name="parallax_star_id" value="{{ .star.ID }}">
 
             <div class="add-section">
                 <h2 class="add-section-title">Медиа</h2>
@@ -68,7 +68,7 @@
             <h1 class="add-header">Новая звезда</h1>
         </div>
 
-        <form action="/stars" method="POST">
+        <form action="/add_parallax_star" method="POST">
             <div class="add-section">
                 <h2 class="add-section-title">Медиа</h2>
                 <div class="add-media-stack">
@@ -104,11 +104,11 @@
             <img src="/static/img/feed.png" alt="Лента" class="nav-icon">
             <span>Лента</span>
         </a>
-        <a href="/add" class="nav-item active">
+        <a href="/add_parallax_star" class="nav-item active">
             <img src="/static/img/add.png" alt="Добавить" class="nav-icon">
             <span>Добавить</span>
         </a>
-        <a href="/catalog" class="nav-item">
+        <a href="/parallax_stars_catalog" class="nav-item">
             <img src="/static/img/menu.png" alt="Каталог" class="nav-icon">
             <span>Каталог</span>
         </a>
