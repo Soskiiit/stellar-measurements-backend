@@ -1,0 +1,406 @@
+{
+	"info": {
+		"_postman_id": "stellar-measurements-lr3-collection",
+		"name": "Stellar Measurements - Лабораторная 3 (REST API)",
+		"description": "Коллекция из 10 запросов для демонстрации ЛР3 по теме 'Определение расстояния до звезды в Млечном пути по ее годовому параллаксу'",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "starId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. GET Список опубликованных звезд (с фильтром distance)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars?distance=50",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars"
+					],
+					"query": [
+						{
+							"key": "distance",
+							"value": "50",
+							"description": "Максимальное расстояние до звезды (в парсеках)"
+						}
+					]
+				},
+				"description": "Получение списка опубликованных звезд с серверной фильтрацией по расстоянию. Включает признак is_creator (0 или 1)."
+			},
+			"response": []
+		},
+		{
+			"name": "2. POST Добавление новой звезды с фото и видео в MinIO",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "Денеб",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Белый сверхгигант в созвездии Лебедя, спектральный класс A2Ia.",
+							"type": "text"
+						},
+						{
+							"key": "parallax",
+							"value": "0.002",
+							"type": "text"
+						},
+						{
+							"key": "distance",
+							"value": "500.00",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": "resources/img/parallax_star_default_404.jpg",
+							"description": "Файл изображения звезды (сохраняется в MinIO с латинским именем)"
+						},
+						{
+							"key": "video",
+							"type": "file",
+							"src": "resources/videos/parallax_star_default.mp4",
+							"description": "Файл видео звезды (сохраняется в MinIO с латинским именем)"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars"
+					]
+				},
+				"description": "Создание услуги в статусе draft с загрузкой медиафайлов в хранилище MinIO. Файлы именуются на латинице."
+			},
+			"response": []
+		},
+		{
+			"name": "3. GET Получение черновика текущего пользователя",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/draft",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"draft"
+					]
+				},
+				"description": "Получение единственного черновика текущего пользователя (синглтон). ID в URL не указывается."
+			},
+			"response": []
+		},
+		{
+			"name": "4. PUT Публикация звезды (смена статуса на published)",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Ярчайшая звезда созвездия Лебедя, вершина Летнего треугольника.\",\n    \"parallax\": 0.002,\n    \"distance\": 500.00\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/4/publish",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"4",
+						"publish"
+					]
+				},
+				"description": "Публикация черновика создателем. Статус меняется на published, выставляется date_finish."
+			},
+			"response": []
+		},
+		{
+			"name": "5. GET Лента звезд (без ID, первая звезда)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/feed",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"feed"
+					]
+				},
+				"description": "Получение первой опубликованной звезды для вертикальной ленты Vibes."
+			},
+			"response": []
+		},
+		{
+			"name": "6. GET Лента звезд по ID (?next=true, следующая звезда)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/feed/1?next=true",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"feed",
+						"1"
+					],
+					"query": [
+						{
+							"key": "next",
+							"value": "true",
+							"description": "Переход к следующей опубликованной звезде"
+						}
+					]
+				},
+				"description": "Получение следующей опубликованной звезды после ID=1 (с циклическим переходом)."
+			},
+			"response": []
+		},
+		{
+			"name": "7. POST Поставить / отменить лайк (like=1 или like=0)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"like\": 1\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/2/like",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"2",
+						"like"
+					]
+				},
+				"description": "Установка лайка (like: 1) или отмена лайка (like: 0) от имени зафиксированного пользователя."
+			},
+			"response": []
+		},
+		{
+			"name": "8. DELETE Логическое удаление звезды (soft delete)",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/3",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"3"
+					]
+				},
+				"description": "Логическое удаление услуги (статус меняется на deleted). Разрешено только для услуг текущего пользователя."
+			},
+			"response": []
+		},
+		{
+			"name": "9. POST Регистрация нового пользователя",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"astronomer_alex\",\n    \"password\": \"stellarPass2026!\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"register"
+					]
+				},
+				"description": "Регистрация нового пользователя в системе с валидацией уникальности логина."
+			},
+			"response": []
+		},
+		{
+			"name": "10. POST Аутентификация пользователя (заглушка для ЛР4)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"user1\",\n    \"password\": \"password1\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/users/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"login"
+					]
+				},
+				"description": "Заглушка аутентификации для 4-й лабораторной работы, возвращает mock JWT токен."
+			},
+			"response": []
+		},
+		{
+			"name": "11 (бонус). POST Деавторизация пользователя (заглушка для ЛР4)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/users/logout",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"logout"
+					]
+				},
+				"description": "Заглушка деавторизации для 4-й лабораторной работы."
+			},
+			"response": []
+		},
+		{
+			"name": "12 (бонус). GET Пользователь со звездами (вложенная сериализация)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/users/1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"users",
+						"1"
+					]
+				},
+				"description": "Демонстрация вложенной сериализации: профиль пользователя и созданные им звезды."
+			},
+			"response": []
+		}
+	]
+}
