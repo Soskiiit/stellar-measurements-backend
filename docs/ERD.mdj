@@ -1299,7 +1299,7 @@
 											"parentStyle": true,
 											"left": 373,
 											"top": 462,
-											"width": 519,
+											"width": 527,
 											"height": 14,
 											"text": "Модель"
 										},
@@ -1337,7 +1337,7 @@
 									"parentStyle": true,
 									"left": 368,
 									"top": 455,
-									"width": 529,
+									"width": 537,
 									"height": 26,
 									"stereotypeLabel": {
 										"$ref": "AAAAAAGhEJdZ9Pb0RfI="
@@ -1356,12 +1356,6 @@
 							"containedViews": [
 								{
 									"$ref": "AAAAAAGhEJqj4veiYAw="
-								},
-								{
-									"$ref": "AAAAAAGhELl2rfqf6mE="
-								},
-								{
-									"$ref": "AAAAAAGhEJtnsffQYiI="
 								}
 							],
 							"font": "Arial;14;0",
@@ -1369,7 +1363,7 @@
 							"containerChangeable": true,
 							"left": 368,
 							"top": 440,
-							"width": 528,
+							"width": 536,
 							"height": 160,
 							"nameCompartment": {
 								"$ref": "AAAAAAGhEJdZ9Pbz6LA="
@@ -1433,9 +1427,9 @@
 											"parentStyle": true,
 											"left": 64,
 											"top": 224,
-											"width": 87.130859375,
+											"width": 87.513671875,
 											"height": 14,
-											"text": "(from LAB3)"
+											"text": "(from Бэкенд)"
 										},
 										{
 											"_type": "LabelView",
@@ -1693,9 +1687,9 @@
 											"parentStyle": true,
 											"left": 64,
 											"top": 208,
-											"width": 87.130859375,
+											"width": 87.513671875,
 											"height": 14,
-											"text": "(from LAB3)"
+											"text": "(from Бэкенд)"
 										},
 										{
 											"_type": "LabelView",
@@ -2025,9 +2019,9 @@
 											"parentStyle": true,
 											"left": 14,
 											"top": 64,
-											"width": 87.130859375,
+											"width": 91.46484375,
 											"height": 14,
-											"text": "(from LAB3)"
+											"text": "(from Модель)"
 										},
 										{
 											"_type": "LabelView",
@@ -3573,9 +3567,9 @@
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"top": -18,
-											"width": 87.130859375,
+											"width": 124.60546875,
 											"height": 14,
-											"text": "(from LAB3)"
+											"text": "(from База данных)"
 										},
 										{
 											"_type": "LabelView",
@@ -3762,9 +3756,9 @@
 											"parentStyle": true,
 											"left": 16,
 											"top": -32,
-											"width": 87.130859375,
+											"width": 124.60546875,
 											"height": 14,
-											"text": "(from LAB3)"
+											"text": "(from База данных)"
 										},
 										{
 											"_type": "LabelView",
@@ -3952,9 +3946,9 @@
 											"parentStyle": true,
 											"left": 16,
 											"top": -32,
-											"width": 87.130859375,
+											"width": 124.60546875,
 											"height": 14,
-											"text": "(from LAB3)"
+											"text": "(from База данных)"
 										},
 										{
 											"_type": "LabelView",
@@ -4772,7 +4766,194 @@
 					"_parent": {
 						"$ref": "AAAAAAGhEJUqmvX5AUg="
 					},
-					"name": "Бэкенд"
+					"name": "Бэкенд",
+					"ownedElements": [
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAGhEJk5SPca6AE=",
+							"_parent": {
+								"$ref": "AAAAAAGhEJbrz/a69ss="
+							},
+							"name": "Домен users",
+							"ownedElements": [
+								{
+									"_type": "UMLInterfaceRealization",
+									"_id": "AAAAAAGhEKz9c/lqvyU=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"source": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"target": {
+										"$ref": "AAAAAAGhEKz9TPlBvNg="
+									}
+								},
+								{
+									"_type": "UMLDependency",
+									"_id": "AAAAAAGhELe1mPotmHQ=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"source": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"target": {
+										"$ref": "AAAAAAGhEJqIFvd2hIQ="
+									}
+								}
+							],
+							"operations": [
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK9YHPnUWIE=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"name": "POST /api/users/register"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhELEb1/njZMg=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"name": "POST /api/users/login"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhELGPOPnrKMQ=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"name": "POST /api/users/logout"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhELLLUPnzZxo=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJk5SPca6AE="
+									},
+									"name": "GET /api/users/:id"
+								}
+							]
+						},
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAGhEJmCZ/dFhaU=",
+							"_parent": {
+								"$ref": "AAAAAAGhEJbrz/a69ss="
+							},
+							"name": "Домен parallax_stars",
+							"ownedElements": [
+								{
+									"_type": "UMLInterfaceRealization",
+									"_id": "AAAAAAGhEKzGk/kuWNQ=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"source": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"target": {
+										"$ref": "AAAAAAGhEKzGXvkF2s8="
+									}
+								},
+								{
+									"_type": "UMLDependency",
+									"_id": "AAAAAAGhELfMVvo+9k8=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"source": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"target": {
+										"$ref": "AAAAAAGhEJqj4vegUko="
+									}
+								},
+								{
+									"_type": "UMLDependency",
+									"_id": "AAAAAAGhELfgtvpPbAE=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"source": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"target": {
+										"$ref": "AAAAAAGhEJtnsffOud0="
+									}
+								}
+							],
+							"operations": [
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK6fgfmwQ34=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "GET /api/parallax_stars"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK6t8/m29TQ=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "GET /api/parallax_stars/feed"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK6xY/m8K6g=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "GET /api/parallax_stars/feed/:id"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK60VvnC87o=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "GET /api/parallax_stars/draft"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK63JvnIEbg=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "POST /api/parallax_stars"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhEK65zPnOqbA=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "PUT /api/parallax_stars/:id/publish"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhELVld/oBPUY=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "DELETE /api/parallax_stars/:id"
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAGhELWotvoJpY8=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJmCZ/dFhaU="
+									},
+									"name": "POST /api/parallax_stars/:id/like"
+								}
+							]
+						}
+					]
 				},
 				{
 					"_type": "UMLPackage",
@@ -4780,7 +4961,33 @@
 					"_parent": {
 						"$ref": "AAAAAAGhEJUqmvX5AUg="
 					},
-					"name": "База данных"
+					"name": "База данных",
+					"ownedElements": [
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAGhELmmXfratIk=",
+							"_parent": {
+								"$ref": "AAAAAAGhEJcZzvbUhAI="
+							},
+							"name": "parallax_stars"
+						},
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAGhELqz0/tw1j0=",
+							"_parent": {
+								"$ref": "AAAAAAGhEJcZzvbUhAI="
+							},
+							"name": "parallax_star_likes"
+						},
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAGhELtq3/unE0E=",
+							"_parent": {
+								"$ref": "AAAAAAGhEJcZzvbUhAI="
+							},
+							"name": "users"
+						}
+					]
 				},
 				{
 					"_type": "UMLPackage",
@@ -4835,214 +5042,29 @@
 									}
 								}
 							]
-						}
-					]
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhEJk5SPca6AE=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "Домен users",
-					"ownedElements": [
-						{
-							"_type": "UMLInterfaceRealization",
-							"_id": "AAAAAAGhEKz9c/lqvyU=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"source": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"target": {
-								"$ref": "AAAAAAGhEKz9TPlBvNg="
-							}
 						},
 						{
-							"_type": "UMLDependency",
-							"_id": "AAAAAAGhELe1mPotmHQ=",
+							"_type": "UMLClass",
+							"_id": "AAAAAAGhEJqIFvd2hIQ=",
 							"_parent": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
+								"$ref": "AAAAAAGhEJdZ9PbwdZ0="
 							},
-							"source": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"target": {
-								"$ref": "AAAAAAGhEJqIFvd2hIQ="
-							}
-						}
-					],
-					"operations": [
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK9YHPnUWIE=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"name": "POST /api/users/register"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhELEb1/njZMg=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"name": "POST /api/users/login"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhELGPOPnrKMQ=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"name": "POST /api/users/logout"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhELLLUPnzZxo=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJk5SPca6AE="
-							},
-							"name": "GET /api/users/:id"
-						}
-					]
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhEJmCZ/dFhaU=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "Домен parallax_stars",
-					"ownedElements": [
-						{
-							"_type": "UMLInterfaceRealization",
-							"_id": "AAAAAAGhEKzGk/kuWNQ=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"source": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"target": {
-								"$ref": "AAAAAAGhEKzGXvkF2s8="
-							}
-						},
-						{
-							"_type": "UMLDependency",
-							"_id": "AAAAAAGhELfMVvo+9k8=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"source": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"target": {
-								"$ref": "AAAAAAGhEJqj4vegUko="
-							}
-						},
-						{
-							"_type": "UMLDependency",
-							"_id": "AAAAAAGhELfgtvpPbAE=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"source": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"target": {
-								"$ref": "AAAAAAGhEJtnsffOud0="
-							}
-						}
-					],
-					"operations": [
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK6fgfmwQ34=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "GET /api/parallax_stars"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK6t8/m29TQ=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "GET /api/parallax_stars/feed"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK6xY/m8K6g=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "GET /api/parallax_stars/feed/:id"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK60VvnC87o=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "GET /api/parallax_stars/draft"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK63JvnIEbg=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "POST /api/parallax_stars"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhEK65zPnOqbA=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "PUT /api/parallax_stars/:id/publish"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhELVld/oBPUY=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "DELETE /api/parallax_stars/:id"
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAGhELWotvoJpY8=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJmCZ/dFhaU="
-							},
-							"name": "POST /api/parallax_stars/:id/like"
-						}
-					]
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhEJqIFvd2hIQ=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "User",
-					"ownedElements": [
-						{
-							"_type": "UMLDependency",
-							"_id": "AAAAAAGhELycBvvaZso=",
-							"_parent": {
-								"$ref": "AAAAAAGhEJqIFvd2hIQ="
-							},
-							"source": {
-								"$ref": "AAAAAAGhEJqIFvd2hIQ="
-							},
-							"target": {
-								"$ref": "AAAAAAGhELtq3/unE0E="
-							}
+							"name": "User",
+							"ownedElements": [
+								{
+									"_type": "UMLDependency",
+									"_id": "AAAAAAGhELycBvvaZso=",
+									"_parent": {
+										"$ref": "AAAAAAGhEJqIFvd2hIQ="
+									},
+									"source": {
+										"$ref": "AAAAAAGhEJqIFvd2hIQ="
+									},
+									"target": {
+										"$ref": "AAAAAAGhELtq3/unE0E="
+									}
+								}
+							]
 						}
 					]
 				},
@@ -5061,38 +5083,6 @@
 						"$ref": "AAAAAAGhEJUqmvX5AUg="
 					},
 					"name": "API users"
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhELmmXfratIk=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "parallax_stars"
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhELqz0/tw1j0=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "parallax_star_likes"
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhELtq3/unE0E=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "users"
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAGhEMSTSPwYsMI=",
-					"_parent": {
-						"$ref": "AAAAAAGhEJUqmvX5AUg="
-					},
-					"name": "Class1"
 				},
 				{
 					"_type": "UMLClass",
