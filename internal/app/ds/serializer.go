@@ -90,11 +90,6 @@ func ToFullParallaxStarSerializer(star *ParallaxStar, currentUserID uint) FullPa
 	}
 }
 
-type UserWithStarsSerializer struct {
-	User  UserSerializer                      `json:"user"`
-	Stars []ParallaxStarCatalogItemSerializer `json:"stars"`
-}
-
 type CreateParallaxStarRequest struct {
 	Name        string  `form:"name" json:"name" binding:"required"`
 	Description string  `form:"description" json:"description"`

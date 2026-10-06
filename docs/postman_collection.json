@@ -50,7 +50,57 @@
 			"response": []
 		},
 		{
-			"name": "2. POST Добавление новой звезды с фото и видео в MinIO",
+			"name": "2. GET Лента опубликованных звезд (is_liked)",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/feed",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"feed"
+					]
+				},
+				"description": "Получение опубликованной звезды для вертикальной ленты Vibes с признаком is_liked (0 или 1). Поддерживает опциональные query-параметры ?id={{starId}}&next=true для перехода к следующей звезде."
+			},
+			"response": []
+		},
+		{
+			"name": "3. GET Получение черновика текущего пользователя",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}/api/parallax_stars/draft",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"parallax_stars",
+						"draft"
+					]
+				},
+				"description": "Получение единственного черновика текущего пользователя (синглтон). ID в URL не указывается."
+			},
+			"response": []
+		},
+		{
+			"name": "4. POST Добавление новой звезды с фото и видео в MinIO",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -111,32 +161,7 @@
 			"response": []
 		},
 		{
-			"name": "3. GET Получение черновика текущего пользователя",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/api/parallax_stars/draft",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"parallax_stars",
-						"draft"
-					]
-				},
-				"description": "Получение единственного черновика текущего пользователя (синглтон). ID в URL не указывается."
-			},
-			"response": []
-		},
-		{
-			"name": "4. PUT Публикация звезды (смена статуса на published)",
+			"name": "5. PUT Публикация звезды (смена статуса на published)",
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -170,9 +195,9 @@
 			"response": []
 		},
 		{
-			"name": "5. GET Лента звезд (без ID, первая звезда)",
+			"name": "6. DELETE Логическое удаление звезды (soft delete)",
 			"request": {
-				"method": "GET",
+				"method": "DELETE",
 				"header": [
 					{
 						"key": "Accept",
@@ -180,50 +205,17 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseUrl}}/api/parallax_stars/feed",
+					"raw": "{{baseUrl}}/api/parallax_stars/3",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"api",
 						"parallax_stars",
-						"feed"
+						"3"
 					]
 				},
-				"description": "Получение первой опубликованной звезды для вертикальной ленты Vibes."
-			},
-			"response": []
-		},
-		{
-			"name": "6. GET Лента звезд по ID (?next=true, следующая звезда)",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/api/parallax_stars/feed/1?next=true",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"parallax_stars",
-						"feed",
-						"1"
-					],
-					"query": [
-						{
-							"key": "next",
-							"value": "true",
-							"description": "Переход к следующей опубликованной звезде"
-						}
-					]
-				},
-				"description": "Получение следующей опубликованной звезды после ID=1 (с циклическим переходом)."
+				"description": "Логическое удаление услуги (статус меняется на deleted). Разрешено только для услуг текущего пользователя."
 			},
 			"response": []
 		},
@@ -262,32 +254,7 @@
 			"response": []
 		},
 		{
-			"name": "8. DELETE Логическое удаление звезды (soft delete)",
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/api/parallax_stars/3",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"parallax_stars",
-						"3"
-					]
-				},
-				"description": "Логическое удаление услуги (статус меняется на deleted). Разрешено только для услуг текущего пользователя."
-			},
-			"response": []
-		},
-		{
-			"name": "9. POST Регистрация нового пользователя",
+			"name": "8. POST Регистрация нового пользователя",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -320,7 +287,7 @@
 			"response": []
 		},
 		{
-			"name": "10. POST Аутентификация пользователя (заглушка для ЛР4)",
+			"name": "9. POST Аутентификация пользователя (заглушка для ЛР4)",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -353,7 +320,7 @@
 			"response": []
 		},
 		{
-			"name": "11 (бонус). POST Деавторизация пользователя (заглушка для ЛР4)",
+			"name": "10. POST Деавторизация пользователя (заглушка для ЛР4)",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -374,31 +341,6 @@
 					]
 				},
 				"description": "Заглушка деавторизации для 4-й лабораторной работы."
-			},
-			"response": []
-		},
-		{
-			"name": "12 (бонус). GET Пользователь со звездами (вложенная сериализация)",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/api/users/1",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"users",
-						"1"
-					]
-				},
-				"description": "Демонстрация вложенной сериализации: профиль пользователя и созданные им звезды."
 			},
 			"response": []
 		}

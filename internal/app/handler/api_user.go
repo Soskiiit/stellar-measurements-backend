@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 	"strings"
 
 	"stellar-measurements-backend/internal/app/ds"
@@ -92,27 +91,4 @@ func (h *Handler) LogoutUserAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Деавторизация выполнена успешно",
 	})
-}
-
-// GetUserWithStarsAPI - GET /api/users/:id
-// Получение профиля пользователя со списком его созданных звезд (демонстрация вложенной сериализации)
-func (h *Handler) GetUserWithStarsAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	userID, err := strconv.Atoi(idStr)
-	if err != nil || userID <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Некорректный ID пользователя",
-		})
-		return
-	}
-
-	data, err := h.Repository.GetUserWithStars(uint(userID))
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, data)
 }

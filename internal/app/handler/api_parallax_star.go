@@ -65,15 +65,12 @@ func (h *Handler) GetParallaxStarsAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-// GetParallaxStarFeedAPI - GET /api/parallax_stars/feed и GET /api/parallax_stars/feed/:id
-// Лента опубликованных звезд: без ID возвращает первую звезду; с ID и next=true переходит к следующей звезде.
+// GetParallaxStarFeedAPI - GET /api/parallax_stars/feed
+// Лента опубликованных звезд (только опубликованные). Возвращает признак is_liked (0/1),
+// если текущий пользователь лайкнул эту услугу. С параметрами ?id=...&next=true переходит к следующей звезде.
 func (h *Handler) GetParallaxStarFeedAPI(ctx *gin.Context) {
 	currentUserID := session.GetCurrentUserID()
-	idStr := ctx.Param("id")
-	if idStr == "" {
-		idStr = ctx.Query("id")
-	}
-
+	idStr := ctx.Query("id")
 	next := ctx.Query("next") == "true"
 
 	var starID *int
@@ -199,8 +196,8 @@ func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, serializer)
 }
 
-// PublishParallaxStarAPI - PUT /api/parallax_stars/:id/publish или PUT /api/parallax_stars/:id
-// Публикация черновика: изменение статуса на 'published', фиксация даты формирования (date_finish),
+// PublishParallaxStarAPI - PUT /api/parallax_stars/:id/publish
+// Публикация черновика (смена статуса на 'published'): фиксация даты формирования (date_finish),
 // заполнение описания, годичного параллакса и расчет расстояния.
 func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 	currentUserID := session.GetCurrentUserID()

@@ -1554,6 +1554,7 @@
 											"model": {
 												"$ref": "AAAAAAGhELLLUPnzZxo="
 											},
+											"visible": false,
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 421,
@@ -1569,7 +1570,7 @@
 									"left": 416,
 									"top": 252,
 									"width": 181.775390625,
-									"height": 72
+									"height": 56
 								},
 								{
 									"_type": "UMLReceptionCompartmentView",
@@ -1796,6 +1797,7 @@
 											"model": {
 												"$ref": "AAAAAAGhEK6xY/m8K6g="
 											},
+											"visible": false,
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 653,
@@ -1817,7 +1819,7 @@
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 653,
-											"top": 305,
+											"top": 289,
 											"width": 230.93359375,
 											"height": 14,
 											"text": "+GET /api/parallax_stars/draft()",
@@ -1835,7 +1837,7 @@
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 653,
-											"top": 321,
+											"top": 305,
 											"width": 230.93359375,
 											"height": 14,
 											"text": "+POST /api/parallax_stars()",
@@ -1853,7 +1855,7 @@
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 653,
-											"top": 337,
+											"top": 321,
 											"width": 230.93359375,
 											"height": 14,
 											"text": "+PUT /api/parallax_stars/:id/publish()",
@@ -1871,7 +1873,7 @@
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 653,
-											"top": 353,
+											"top": 337,
 											"width": 230.93359375,
 											"height": 14,
 											"text": "+DELETE /api/parallax_stars/:id()",
@@ -1889,7 +1891,7 @@
 											"font": "Arial;14;0",
 											"parentStyle": true,
 											"left": 653,
-											"top": 369,
+											"top": 353,
 											"width": 230.93359375,
 											"height": 14,
 											"text": "+POST /api/parallax_stars/:id/like()",
@@ -1901,7 +1903,7 @@
 									"left": 648,
 									"top": 252,
 									"width": 240.93359375,
-									"height": 136
+									"height": 120
 								},
 								{
 									"_type": "UMLReceptionCompartmentView",

@@ -25,11 +25,9 @@ func (h *Handler) RegisterHandler(router *gin.Engine) {
 		// Домен услуги (звезды):
 		api.GET("/parallax_stars", h.GetParallaxStarsAPI)
 		api.GET("/parallax_stars/feed", h.GetParallaxStarFeedAPI)
-		api.GET("/parallax_stars/feed/:id", h.GetParallaxStarFeedAPI)
 		api.GET("/parallax_stars/draft", h.GetDraftAPI)
 		api.POST("/parallax_stars", h.AddParallaxStarAPI)
 		api.PUT("/parallax_stars/:id/publish", h.PublishParallaxStarAPI)
-		api.PUT("/parallax_stars/:id", h.PublishParallaxStarAPI)
 		api.DELETE("/parallax_stars/:id", h.DeleteParallaxStarAPI)
 		api.POST("/parallax_stars/:id/like", h.LikeParallaxStarAPI)
 
@@ -37,7 +35,6 @@ func (h *Handler) RegisterHandler(router *gin.Engine) {
 		api.POST("/users/register", h.RegisterUserAPI)
 		api.POST("/users/login", h.LoginUserAPI)
 		api.POST("/users/logout", h.LogoutUserAPI)
-		api.GET("/users/:id", h.GetUserWithStarsAPI)
 	}
 
 	// ==================== SSR ШАБЛОНЫ (ЛР1 и ЛР2) ====================
