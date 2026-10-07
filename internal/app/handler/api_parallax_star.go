@@ -304,49 +304,22 @@ func (h *Handler) DeleteParallaxStarAPI(ctx *gin.Context) {
 // LikeParallaxStarAPI - POST /api/parallax_stars/:id/like
 // Поставить (like=1) или отменить (like=0) лайк от текущего пользователя.
 func (h *Handler) LikeParallaxStarAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
-	idStr := ctx.Param("id")
-	starID, err := strconv.Atoi(idStr)
+	starID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil || starID <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Некорректный ID звезды",
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID звезды"})
 		return
 	}
 
 	var req ds.LikeParallaxStarRequest
-	if strings.Contains(ctx.GetHeader("Content-Type"), "application/json") {
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Необходимо передать поле 'like' (1 или 0)",
-			})
-			return
-		}
-	} else {
-		likeStr := ctx.PostForm("like")
-		likeVal, err := strconv.Atoi(likeStr)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Поле 'like' должно быть 1 или 0",
-			})
-			return
-		}
-		req.Like = &likeVal
-	}
-
-	if req.Like == nil || (*req.Like != 0 && *req.Like != 1) {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Значение поля 'like' должно быть 1 (поставить) или 0 (отменить)",
-		})
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Поле 'like' должно быть 1 или 0"})
 		return
 	}
 
-	isLiked, likesCount, err := h.Repository.ToggleStarLike(uint(starID), currentUserID, *req.Like)
+	isLiked, likesCount, err := h.Repository.ToggleStarLike(uint(starID), session.GetCurrentUserID(), req.Like)
 	if err != nil {
 		logrus.Errorf("Ошибка обработки лайка: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

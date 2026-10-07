@@ -104,7 +104,7 @@ type PublishParallaxStarRequest struct {
 }
 
 type LikeParallaxStarRequest struct {
-	Like *int `form:"like" json:"like" binding:"required"` // 1 - поставить, 0 - отменить
+	Like int `json:"like" binding:"oneof=0 1"` // 1 - поставить, 0 - отменить
 }
 
 type UserRegisterRequest struct {
