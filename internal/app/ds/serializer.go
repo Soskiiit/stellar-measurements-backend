@@ -1,9 +1,5 @@
 package ds
 
-import (
-	"time"
-)
-
 type UserSerializer struct {
 	ID          uint   `json:"id"`
 	Login       string `json:"login"`
@@ -22,47 +18,27 @@ func ToUserSerializer(user *User) UserSerializer {
 }
 
 type ParallaxStarCatalogItemSerializer struct {
+	ID         uint    `json:"id"`
+	Name       string  `json:"name"`
+	ImageURL   string  `json:"image_url"`
+	Distance   float64 `json:"distance"`
+	LikesCount int     `json:"likes_count"`
+	IsCreator  int     `json:"is_creator"`
+}
+
+type ParallaxStarFeedSerializer struct {
 	ID          uint    `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
-	Status      string  `json:"status"`
 	ImageURL    string  `json:"image_url"`
 	VideoURL    string  `json:"video_url"`
 	Parallax    float64 `json:"parallax"`
 	Distance    float64 `json:"distance"`
 	LikesCount  int     `json:"likes_count"`
-	IsCreator   int     `json:"is_creator"` // 0 или 1
+	IsLiked     int     `json:"is_liked"`
 }
 
-type FullParallaxStarSerializer struct {
-	ID          uint           `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Status      string         `json:"status"`
-	ImageURL    string         `json:"image_url"`
-	VideoURL    string         `json:"video_url"`
-	Parallax    float64        `json:"parallax"`
-	Distance    float64        `json:"distance"`
-	DateCreate  time.Time      `json:"date_create"`
-	DateFinish  *time.Time     `json:"date_finish"`
-	CreatorID   uint           `json:"creator_id"`
-	Creator     UserSerializer `json:"creator"`
-	LikesCount  int            `json:"likes_count"`
-	IsCreator   int            `json:"is_creator"` // 0 или 1
-	IsLiked     int            `json:"is_liked"`   // 0 или 1
-}
-
-func ToFullParallaxStarSerializer(star *ParallaxStar, currentUserID uint) FullParallaxStarSerializer {
-	var dateFinish *time.Time
-	if star.DateFinish.Valid {
-		dateFinish = &star.DateFinish.Time
-	}
-
-	isCreator := 0
-	if star.CreatorID == currentUserID {
-		isCreator = 1
-	}
-
+func ToParallaxStarFeedSerializer(star *ParallaxStar, currentUserID uint) ParallaxStarFeedSerializer {
 	isLiked := 0
 	for _, l := range star.Likes {
 		if l.UserID == currentUserID {
@@ -71,23 +47,45 @@ func ToFullParallaxStarSerializer(star *ParallaxStar, currentUserID uint) FullPa
 		}
 	}
 
-	return FullParallaxStarSerializer{
+	return ParallaxStarFeedSerializer{
 		ID:          star.ID,
 		Name:        star.Name,
 		Description: star.Description,
-		Status:      star.Status,
 		ImageURL:    star.ImageURL,
 		VideoURL:    star.VideoURL,
 		Parallax:    star.Parallax,
 		Distance:    star.Distance,
-		DateCreate:  star.DateCreate,
-		DateFinish:  dateFinish,
-		CreatorID:   star.CreatorID,
-		Creator:     ToUserSerializer(&star.Creator),
 		LikesCount:  len(star.Likes),
-		IsCreator:   isCreator,
 		IsLiked:     isLiked,
 	}
+}
+
+type ParallaxStarDraftSerializer struct {
+	ID          uint    `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	ImageURL    string  `json:"image_url"`
+	VideoURL    string  `json:"video_url"`
+	Parallax    float64 `json:"parallax"`
+	Distance    float64 `json:"distance"`
+}
+
+func ToParallaxStarDraftSerializer(star *ParallaxStar) ParallaxStarDraftSerializer {
+	return ParallaxStarDraftSerializer{
+		ID:          star.ID,
+		Name:        star.Name,
+		Description: star.Description,
+		ImageURL:    star.ImageURL,
+		VideoURL:    star.VideoURL,
+		Parallax:    star.Parallax,
+		Distance:    star.Distance,
+	}
+}
+
+type FullParallaxStarSerializer = ParallaxStarFeedSerializer
+
+func ToFullParallaxStarSerializer(star *ParallaxStar, currentUserID uint) ParallaxStarFeedSerializer {
+	return ToParallaxStarFeedSerializer(star, currentUserID)
 }
 
 type CreateParallaxStarRequest struct {

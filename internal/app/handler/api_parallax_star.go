@@ -49,16 +49,12 @@ func (h *Handler) GetParallaxStarsAPI(ctx *gin.Context) {
 		}
 
 		result = append(result, ds.ParallaxStarCatalogItemSerializer{
-			ID:          star.ID,
-			Name:        star.Name,
-			Description: star.Description,
-			Status:      star.Status,
-			ImageURL:    star.ImageURL,
-			VideoURL:    star.VideoURL,
-			Parallax:    star.Parallax,
-			Distance:    star.Distance,
-			LikesCount:  len(star.Likes),
-			IsCreator:   isCreator,
+			ID:         star.ID,
+			Name:       star.Name,
+			ImageURL:   star.ImageURL,
+			Distance:   star.Distance,
+			LikesCount: len(star.Likes),
+			IsCreator:  isCreator,
 		})
 	}
 
@@ -93,7 +89,7 @@ func (h *Handler) GetParallaxStarFeedAPI(ctx *gin.Context) {
 		return
 	}
 
-	serializer := ds.ToFullParallaxStarSerializer(star, currentUserID)
+	serializer := ds.ToParallaxStarFeedSerializer(star, currentUserID)
 	ctx.JSON(http.StatusOK, serializer)
 }
 
@@ -117,7 +113,7 @@ func (h *Handler) GetDraftAPI(ctx *gin.Context) {
 		return
 	}
 
-	serializer := ds.ToFullParallaxStarSerializer(draft, currentUserID)
+	serializer := ds.ToParallaxStarDraftSerializer(draft)
 	ctx.JSON(http.StatusOK, serializer)
 }
 
@@ -192,7 +188,7 @@ func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
 		return
 	}
 
-	serializer := ds.ToFullParallaxStarSerializer(star, currentUserID)
+	serializer := ds.ToParallaxStarDraftSerializer(star)
 	ctx.JSON(http.StatusCreated, serializer)
 }
 
@@ -269,7 +265,7 @@ func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 		return
 	}
 
-	serializer := ds.ToFullParallaxStarSerializer(publishedStar, currentUserID)
+	serializer := ds.ToParallaxStarFeedSerializer(publishedStar, currentUserID)
 	ctx.JSON(http.StatusOK, serializer)
 }
 

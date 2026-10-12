@@ -37,43 +37,16 @@ func (h *Handler) RegisterHandler(router *gin.Engine) {
 		api.POST("/users/logout", h.LogoutUserAPI)
 	}
 
-	// ==================== SSR ШАБЛОНЫ (ЛР1 и ЛР2) ====================
-	router.GET("/", h.GetFeed)
-	router.GET("/parallax_stars_feed", h.GetFeed)
-	router.GET("/parallax_stars_feed/:id", h.GetFeed)
-
-	router.GET("/add_parallax_star", h.GetDraft)
-	router.GET("/parallax_stars_catalog", h.GetCatalog)
-
-	router.POST("/add_parallax_star", h.CreateDraft)
-	router.POST("/publish_parallax_star", h.PublishStar)
-	router.POST("/delete_parallax_star", h.DeleteStar)
-
 	// Fallback для несуществующих маршрутов
 	router.NoRoute(func(ctx *gin.Context) {
-		if len(ctx.Request.URL.Path) >= 4 && ctx.Request.URL.Path[:4] == "/api" {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"error": "API маршрут не найден",
-			})
-			return
-		}
-		ctx.Redirect(http.StatusFound, "/")
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "Маршрут не найден",
+		})
 	})
-}
-
-func (h *Handler) RegisterStatic(router *gin.Engine) {
-	router.LoadHTMLGlob("templates/*")
-	router.Static("/static", "./resources")
 }
 
 func (h *Handler) errorHandler(ctx *gin.Context, errorStatusCode int, errMsg string) {
 	logrus.Error(errMsg)
-	if errorStatusCode == http.StatusNotFound {
-		if ctx.Request.URL.Path != "/" {
-			ctx.Redirect(http.StatusFound, "/")
-			return
-		}
-	}
 	ctx.JSON(errorStatusCode, gin.H{
 		"error": errMsg,
 	})
