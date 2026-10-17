@@ -1,224 +1,60 @@
-# Определение расстояния до звезды в Млечном пути по ее годовому параллаксу
+# stellar-measurements-backend
 
-**Веб-сервис бэкенда для заявочной системы измерения параметров звезд.**  
-Выполнено в рамках Лабораторной работы №3 по курсу «Разработка веб-сервисов».
+## Лабораторная 3 — веб-сервис REST API
 
----
+### Домен «Услуга» (параллаксная звезда)
 
-## 1. Предметная область и сущности
+- `GET /api/parallax_stars` — список опубликованных услуг; необязательный query-фильтр `distance` (максимальное расстояние в парсеках по теме). Ответ 200: массив объектов с признаками `is_creator` (1, если создатель — текущий пользователь) и количеством лайков `likes_count`.
+- `GET /api/parallax_stars/feed` — лента: первая опубликованная услуга, id не указывается. Ответ 200: объект с признаками `is_creator` и `is_liked` (1, если текущий пользователь поставил лайк).
+- `GET /api/parallax_stars/feed/:id` — опубликованная услуга по id; 404, если не существует или удалена.
+- `GET /api/parallax_stars/feed/:id?next=true` — следующая опубликованная после id, в конце ленты заворот на первую.
+- `GET /api/parallax_stars/draft` — единственный черновик текущего пользователя, id с клиента не передаётся; 404, если черновика нет.
+- `POST /api/parallax_stars` — создание черновика; принимает `name` (текст), опциональные `description`, `parallax`, `distance` и файлы `image`, `video` (multipart/form-data, именно файлы, а не URL). Файлы сохраняются в MinIO под сгенерированными латинскими именами, URL пишутся в поля БД. Ответ 201 + объект черновика.
+- `PUT /api/parallax_stars/:id/publish` — публикация своего черновика (смена статуса); JSON-тело: `description`, `parallax`, `distance`. Ответ 200 + обновлённый объект; 404, если черновик чужой или уже опубликован.
+- `DELETE /api/parallax_stars/:id` — логическое удаление своей услуги (status = 'deleted', SQL UPDATE через курсор). Ответ 200; чужая услуга — 403.
+- `POST /api/parallax_stars/:id/like` — лайк текущего пользователя; JSON `{"like": 1}` ставит, `{"like": 0}` отменяет. Ответ 200 + `{"is_liked": ..., "likes_count": ...}`.
 
-- **Предметная область:** Определение расстояния до звезды в Млечном пути по ее годовому параллаксу ($d = 1 / p$, где $p$ — параллакс в секундах дуги, $d$ — расстояние в парсеках).
-- **Услуги (Services):** Звёзды (`parallax_stars`).
-- **Заявка:** Расчёт расстояния с указанием годичного параллакса по каждой звезде.
-- **Пользователи (Users):** Учетные записи исследователей и астрономов (`users`).
-- **Лайки / Закладки (Likes):** Отметки пользователей для звёзд (`parallax_star_likes`).
+### Домен «Пользователь»
 
----
+- `POST /api/users/register` — регистрация; JSON `{login, password}`. Ответ 201 + `{id, login}` (пароль не сериализуется); 409, если логин занят.
+- `POST /api/users/login` — заглушка аутентификации для ЛР4. Ответ 200.
+- `POST /api/users/logout` — заглушка деавторизации для ЛР4. Ответ 200.
 
-## 2. Структура базы данных (PostgreSQL)
+### Соглашения ответов
 
-### Таблица `users` (Пользователи)
-| Поле | Тип данных | Ограничения | Описание |
-| :--- | :--- | :--- | :--- |
-| `id` | `BIGSERIAL` / `uint` | `PRIMARY KEY` | Уникальный идентификатор пользователя |
-| `login` | `VARCHAR(50)` | `NOT NULL, UNIQUE` | Логин пользователя |
-| `password` | `VARCHAR(100)` | `NOT NULL` | Хеш пароля (скрыт из сериализации `json:"-"`) |
-| `is_moderator` | `BOOLEAN` | `NOT NULL, DEFAULT false` | Признак роли модератора |
+- Набор полей JSON всегда одинаковый; незаполненные значения приходят как `null` / `""`.
+- Статус услуги в ответах не передаётся (хранится только в БД); коды состояния в тело не дублируются.
+- Успех: 200 / 201; ошибки: 400, 403, 404, 409 без избыточных обёрток.
 
-### Таблица `parallax_stars` (Услуги — Звёзды)
-| Поле | Тип данных | Ограничения | Описание |
-| :--- | :--- | :--- | :--- |
-| `id` | `BIGSERIAL` / `uint` | `PRIMARY KEY` | Уникальный идентификатор карточки звезды |
-| `name` | `VARCHAR(100)` | `NOT NULL` | Наименование звезды (напр., *Проксима Центавра*) |
-| `description` | `VARCHAR(255)` | `DEFAULT ''` | Краткое астрофизическое описание звезды |
-| `status` | `VARCHAR(20)` | `NOT NULL, DEFAULT 'draft'` | Статус услуги: `draft` (черновик), `published` (опубликован), `deleted` (удалён) |
-| `image_url` | `VARCHAR(255)` | `NOT NULL, DEFAULT ''` | Ссылка на изображение звезды в MinIO / статике |
-| `video_url` | `VARCHAR(255)` | `NOT NULL, DEFAULT ''` | Ссылка на видеоролик звезды в MinIO / статике |
-| `parallax` | `NUMERIC(4,3)` | `CHECK (parallax >= 0)` | Годичный параллакс звезды ($p$, в секундах дуги) |
-| `distance` | `NUMERIC(5,2)` | `CHECK (distance >= 0)` | Расстояние до звезды ($d = 1 / p$, в парсеках) |
-| `date_create` | `TIMESTAMPTZ` | `NOT NULL` | Дата и время создания записи (вычисляется сервером) |
-| `date_finish` | `TIMESTAMPTZ` | `DEFAULT NULL` | Дата и время публикации/формирования заявки |
-| `creator_id` | `BIGINT` | `NOT NULL, REFERENCES users(id)` | Внешний ключ: создатель услуги |
+## Таблицы базы данных
 
-*Ограничения:*
-- Каскадное удаление запрещено (`RESTRICT`).
-- Для каждого пользователя разрешено не более 1 активного черновика (`idx_parallax_stars_creator_draft ON parallax_stars(creator_id) WHERE status = 'draft'`).
+### users — зарегистрированные пользователи
+| Поле | Тип | Описание |
+|---|---|---|
+| id | SERIAL, PK | первичный ключ |
+| login | VARCHAR(50), UNIQUE, NOT NULL | логин |
+| password | VARCHAR(100), NOT NULL | пароль (в ЛР4 — хэш) |
+| is_moderator | BOOLEAN, NOT NULL, DEFAULT false | признак роли модератора |
 
-### Таблица `parallax_star_likes` (Связь M-M: Лайки звезд)
-| Поле | Тип данных | Ограничения | Описание |
-| :--- | :--- | :--- | :--- |
-| `id` | `BIGSERIAL` / `uint` | `PRIMARY KEY` | Идентификатор записи лайка |
-| `user_id` | `BIGINT` | `NOT NULL, REFERENCES users(id)` | Внешний ключ на пользователя |
-| `parallax_star_id` | `BIGINT` | `NOT NULL, REFERENCES parallax_stars(id)` | Внешний ключ на звезду |
+### parallax_stars — черновики, опубликованные и удалённые услуги
+| Поле | Тип | Описание |
+|---|---|---|
+| id | SERIAL, PK | первичный ключ |
+| status | VARCHAR(20), NOT NULL, DEFAULT 'draft' | draft / published / deleted |
+| name | VARCHAR(100), NOT NULL | наименование звезды |
+| description | VARCHAR(255), DEFAULT '' | астрофизическое описание |
+| image_url | VARCHAR(255), DEFAULT '' | ссылка/имя изображения в MinIO |
+| video_url | VARCHAR(255), DEFAULT '' | ссылка/имя видео в MinIO |
+| parallax | NUMERIC(4,3), NULL | годичный параллакс p в секундах дуги (поле по теме) |
+| distance | NUMERIC(5,2), NULL | расстояние d = 1 / p в парсеках (поле по теме) |
+| creator_id | INTEGER, NOT NULL, FK → users.id | создатель (ON DELETE RESTRICT) |
+| date_create | TIMESTAMPTZ, NOT NULL | дата создания черновика |
+| date_finish | TIMESTAMPTZ, NULL | дата формирования / публикации |
 
-*Ограничения:*
-- Уникальный составной индекс `idx_user_parallax_star_like (user_id, parallax_star_id)` исключает повторные лайки.
-
----
-
-## 3. Функция-Singleton текущего пользователя
-
-В соответствии с методическими указаниями к ЛР3, пользователь-создатель зафиксирован константой через функцию-синглтон, инициализируемую при старте приложения.
-
-Файл: `internal/app/session/session.go`:
-```go
-package session
-
-import (
-	"stellar-measurements-backend/internal/app/ds"
-)
-
-const CurrentUserConstantID uint = 1
-
-// CurrentUser - синглтон/константа текущего пользователя при старте сервиса
-var CurrentUser = &ds.User{
-	ID:          CurrentUserConstantID,
-	Login:       "user1",
-	IsModerator: false,
-}
-
-func GetCurrentUser() *ds.User {
-	return CurrentUser
-}
-
-func GetCurrentUserID() uint {
-	return CurrentUser.ID
-}
-```
-
-### Использование синглтона в методах:
-- `GetParallaxStarsAPI`: вычисляет признак `is_creator` (0 или 1), сравнивая `star.CreatorID == session.GetCurrentUserID()`.
-- `GetParallaxStarFeedAPI`: передает ID текущего пользователя для вычисления `is_creator` и `is_liked`.
-- `GetDraftAPI`: находит черновик именно для пользователя `session.GetCurrentUserID()`.
-- `AddParallaxStarAPI`: устанавливает `CreatorID` новой звезды равным `session.GetCurrentUserID()`.
-- `PublishParallaxStarAPI`: запрещает публикацию чужой звезды (`star.CreatorID != session.GetCurrentUserID()`).
-- `DeleteParallaxStarAPI`: разрешает удаление только звезд текущего пользователя (`star.CreatorID != session.GetCurrentUserID()`).
-- `LikeParallaxStarAPI`: привязывает установку/снятие лайка к `session.GetCurrentUserID()`.
-
----
-
-### 4. Описание REST API методов (`/api`)
-
-Все методы сервиса расположены под префиксом `/api` и возвращают ответы в формате JSON. В соответствии с методическими требованиями реализовано ровно 10 эндпоинтов (7 для домена услуг и 3 для домена пользователей).
-
-| № | Метод | URL | Назначение |
-| :-: | :--- | :--- | :--- |
-| 1 | `GET` | `/api/parallax_stars` | Список опубликованных звезд (с фильтром по `distance` и полем `is_creator`: 0/1) |
-| 2 | `GET` | `/api/parallax_stars/feed` | Лента опубликованных звезд (признак `is_liked`: 0/1; с параметрами `?id=...&next=true` — переход к следующей) |
-| 3 | `GET` | `/api/parallax_stars/draft` | Получение активного черновика текущего пользователя (не более 1 записи, без ID в URL) |
-| 4 | `POST` | `/api/parallax_stars` | Добавление новой звезды (черновик) с загрузкой фото и видео в MinIO (имена на латинице) |
-| 5 | `PUT` | `/api/parallax_stars/:id/publish` | Публикация черновика (смена статуса на `published`) |
-| 6 | `DELETE` | `/api/parallax_stars/:id` | Логическое удаление услуги (soft delete) только своего черновика/звезды |
-| 7 | `POST` | `/api/parallax_stars/:id/like` | Установка (`like=1`) или снятие (`like=0`) лайка текущим пользователем |
-| 8 | `POST` | `/api/users/register` | Регистрация нового пользователя |
-| 9 | `POST` | `/api/users/login` | Аутентификация (заглушка для ЛР4, выдача JWT токена) |
-| 10 | `POST` | `/api/users/logout` | Деавторизация (заглушка для ЛР4) |
-
----
-
-### Детальная спецификация эндпоинтов
-
-#### 1. GET `/api/parallax_stars`
-- **Описание:** Получение списка опубликованных звезд.
-- **Параметры query:**
-  - `distance` (float, опционально) — максимальное расстояние в парсеках для фильтрации.
-- **Статус ответа:** `200 OK`.
-- **Поле `is_creator`:** `1`, если создатель звезды совпадает с текущим пользователем, иначе `0`.
-- **Пример ответа:**
-```json
-[
-  {
-    "id": 1,
-    "name": "Проксима Центавра",
-    "description": "Ближайшая к Солнцу звезда.",
-    "status": "published",
-    "image_url": "http://localhost:9002/parallax-stars/star1.jpg",
-    "video_url": "http://localhost:9002/parallax-stars/star1.mp4",
-    "parallax": 0.768,
-    "distance": 1.30,
-    "likes_count": 2,
-    "is_creator": 1
-  }
-]
-```
-
-#### 2. GET `/api/parallax_stars/feed`
-- **Описание:** Лента опубликованных звезд (полная информация по услуге). Без query параметров возвращает первую звезду.
-- **Параметры query (опционально):**
-  - `id` (int) — ID текущей звезды в ленте.
-  - `next` (string: `"true"`) — флаг перехода к следующей опубликованной звезде (с циклическим переходом).
-- **Статус ответа:** `200 OK` (или `404 Not Found`, если опубликованных звезд нет).
-- **Поле `is_liked`:** `1`, если текущий зафиксированный пользователь поставил лайк этой звезде, иначе `0`.
-
-#### 3. GET `/api/parallax_stars/draft`
-- **Описание:** Получение черновика текущего пользователя (не более 1 записи, ID в URL не указывается).
-- **Статус ответа:** `200 OK` (если есть активный черновик), `404 Not Found` (если черновика нет).
-- Возвращает полную модель со вложенным создателем и списком лайков.
-
-#### 4. POST `/api/parallax_stars`
-- **Описание:** Добавление новой звезды в статусе `draft` с сохранением файлов изображения и короткого видео в MinIO (имена генерируются на латинице).
-- **Content-Type:** `multipart/form-data`.
-- **Поля формы:**
-  - `name` (string, обязательно) — наименование звезды.
-  - `description` (string) — краткое описание.
-  - `parallax` (float) — годичный параллакс в секундах дуги.
-  - `distance` (float) — расчетное расстояние в парсеках.
-  - `image` (file) — файл изображения (загружается в бакет `parallax-stars` в MinIO).
-  - `video` (file) — файл видеоролика (загружается в бакет `parallax-stars` в MinIO).
-- **Статусы ответа:** `201 Created` при успехе, `400 Bad Request` при ошибке валидации.
-
-#### 5. PUT `/api/parallax_stars/:id/publish`
-- **Описание:** Публикация черновика создателем (смена статуса на `published`). Системные поля рассчитываются бэкендом (устанавливается `date_finish = now()`).
-- **Тело запроса (JSON):**
-```json
-{
-  "description": "Уточненные астрометрические данные Gaia DR3",
-  "parallax": 0.768,
-  "distance": 1.30
-}
-```
-- **Правило перехода статусов:** Переход разрешен только из `draft` в `published`. Из `deleted` публикация запрещена.
-
-#### 6. DELETE `/api/parallax_stars/:id`
-- **Описание:** Логическое удаление услуги (только soft delete, статус меняется на `deleted`).
-- **Ограничение:** Разрешено только создателю услуги (`creator_id == session.GetCurrentUserID()`).
-- **Статус ответа:** `200 OK`.
-
-#### 7. POST `/api/parallax_stars/:id/like`
-- **Описание:** Установка или отмена лайка от имени текущего зафиксированного пользователя.
-- **Тело запроса (JSON):**
-```json
-{
-  "like": 1
-}
-```
-- `like: 1` — поставить лайк; `like: 0` — отменить лайк.
-- **Статус ответа:** `200 OK`. Возвращает `is_liked` и актуальный `likes_count`.
-
-#### 8. POST `/api/users/register`
-- **Описание:** Регистрация нового пользователя.
-- **Тело запроса (JSON):**
-```json
-{
-  "login": "astronomer1",
-  "password": "secretPassword123"
-}
-```
-- **Статус ответа:** `201 Created`. Пароль исключен из сериализации ответа (`json:"-"`).
-
-#### 9. POST `/api/users/login`
-- **Описание:** Аутентификация пользователя (заглушка для 4-й лабораторной работы).
-- **Тело запроса (JSON):**
-```json
-{
-  "login": "user1",
-  "password": "password1"
-}
-```
-- **Статус ответа:** `200 OK`. Возвращает mock JWT токен и данные пользователя.
-
-#### 10. POST `/api/users/logout`
-- **Описание:** Деавторизация пользователя (заглушка для 4-й лабораторной работы).
-- **Статус ответа:** `200 OK`.
-
----
+### parallax_star_likes — связь многие-ко-многим пользователи ↔ услуги
+| Поле | Тип | Описание |
+|---|---|---|
+| id | SERIAL, PK | первичный ключ |
+| user_id | INTEGER, FK → users.id | кто лайкнул (ON DELETE RESTRICT) |
+| parallax_star_id | INTEGER, FK → parallax_stars.id | что лайкнули (ON DELETE RESTRICT) |
+| — | UNIQUE(user_id, parallax_star_id) | один лайк на пару |
