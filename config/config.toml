@@ -1,2 +1,10 @@
 ServiceHost = "0.0.0.0"
 ServicePort = 8080
+
+[JWT]
+Token = "stellar-secret-token-key-2026"
+ExpiresIn = "24h"
+
+[Redis]
+DialTimeout = "10s"
+ReadTimeout = "10s"

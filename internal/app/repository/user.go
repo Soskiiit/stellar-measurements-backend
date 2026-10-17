@@ -1,13 +1,23 @@
 package repository
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"fmt"
 
 	"stellar-measurements-backend/internal/app/ds"
+	"stellar-measurements-backend/internal/app/role"
 
 	"gorm.io/gorm"
 )
+
+// GenerateHashString хэширует строку с помощью sha1 согласно методическим указаниям
+func GenerateHashString(s string) string {
+	h := sha1.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
+}
 
 func (r *Repository) RegisterUser(login string, password string) (*ds.User, error) {
 	if login == "" || password == "" {
@@ -24,7 +34,8 @@ func (r *Repository) RegisterUser(login string, password string) (*ds.User, erro
 
 	newUser := ds.User{
 		Login:       login,
-		Password:    password,
+		Password:    GenerateHashString(password),
+		Role:        role.Astronomer,
 		IsModerator: false,
 	}
 
@@ -37,7 +48,8 @@ func (r *Repository) RegisterUser(login string, password string) (*ds.User, erro
 
 func (r *Repository) AuthenticateUser(login string, password string) (*ds.User, error) {
 	var user ds.User
-	err := r.db.Where("login = ? AND password = ?", login, password).First(&user).Error
+	hashedPass := GenerateHashString(password)
+	err := r.db.Where("login = ? AND (password = ? OR password = ?)", login, password, hashedPass).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("неверный логин или пароль")
@@ -53,6 +65,18 @@ func (r *Repository) GetUserByID(id uint) (*ds.User, error) {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("пользователь с id=%d не найден", id)
+		}
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *Repository) GetUserByLogin(login string) (*ds.User, error) {
+	var user ds.User
+	err := r.db.Where("login = ?", login).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("пользователь с логином '%s' не найден", login)
 		}
 		return nil, err
 	}

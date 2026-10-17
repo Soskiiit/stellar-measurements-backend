@@ -1,0 +1,542 @@
+basePath: /
+definitions:
+  ds.ErrorResponse:
+    properties:
+      error:
+        example: Описание ошибки
+        type: string
+    type: object
+  ds.LikeParallaxStarRequest:
+    properties:
+      like:
+        description: 1 - поставить, 0 - отменить
+        enum:
+        - 0
+        - 1
+        type: integer
+    type: object
+  ds.LoginResponse:
+    properties:
+      access_token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      expires_in:
+        example: 86400
+        type: integer
+      token_type:
+        example: Bearer
+        type: string
+      user:
+        $ref: '#/definitions/ds.UserSerializer'
+    type: object
+  ds.MessageResponse:
+    properties:
+      message:
+        example: Операция выполнена успешно
+        type: string
+    type: object
+  ds.ParallaxStarCatalogItemSerializer:
+    properties:
+      distance:
+        type: number
+      id:
+        type: integer
+      image_url:
+        type: string
+      is_creator:
+        type: integer
+      likes_count:
+        type: integer
+      name:
+        type: string
+    type: object
+  ds.ParallaxStarDraftSerializer:
+    properties:
+      description:
+        type: string
+      distance:
+        type: number
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      parallax:
+        type: number
+      video_url:
+        type: string
+    type: object
+  ds.ParallaxStarFeedSerializer:
+    properties:
+      description:
+        type: string
+      distance:
+        type: number
+      id:
+        type: integer
+      image_url:
+        type: string
+      is_liked:
+        type: integer
+      likes_count:
+        type: integer
+      name:
+        type: string
+      parallax:
+        type: number
+      video_url:
+        type: string
+    type: object
+  ds.PublishParallaxStarRequest:
+    properties:
+      description:
+        type: string
+      distance:
+        type: number
+      parallax:
+        type: number
+    type: object
+  ds.UserLoginRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  ds.UserRegisterRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  ds.UserSerializer:
+    properties:
+      id:
+        type: integer
+      is_moderator:
+        type: boolean
+      login:
+        type: string
+      role:
+        $ref: '#/definitions/role.Role'
+    type: object
+  role.Role:
+    enum:
+    - 0
+    - 1
+    - 0
+    - 0
+    - 1
+    - 1
+    type: integer
+    x-enum-comments:
+      Astronomer: 0 - обычный пользователь / астроном / создатель услуг
+      Moderator: 1 - модератор
+    x-enum-descriptions:
+    - 0 - обычный пользователь / астроном / создатель услуг
+    - 1 - модератор
+    - ""
+    - ""
+    - ""
+    - ""
+    x-enum-varnames:
+    - Astronomer
+    - Moderator
+    - Creator
+    - Buyer
+    - Admin
+    - Manager
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API веб-сервиса по теме «Определение расстояния до звезды в Млечном
+    пути по ее годовому параллаксу» с JWT-авторизацией.
+  title: Stellar Measurements API
+  version: "1.0"
+paths:
+  /api/parallax_stars:
+    get:
+      description: Возвращает опубликованные звезды с поддержкой серверной фильтрации
+        по расстоянию. Для авторизованных пользователей признак is_creator (1/0) указывает
+        авторство текущего пользователя.
+      parameters:
+      - description: Максимальное расстояние до звезды (пк)
+        in: query
+        name: distance
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ds.ParallaxStarCatalogItemSerializer'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      summary: Список опубликованных звезд каталога
+      tags:
+      - parallax_stars
+    post:
+      consumes:
+      - multipart/form-data
+      description: Создает черновик услуги с автозаполнением создателя из JWT токена
+        и загрузкой фото/видео в MinIO
+      parameters:
+      - description: Название звезды
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Краткое описание
+        in: formData
+        name: description
+        type: string
+      - description: Годичный параллакс (угловые секунды)
+        in: formData
+        name: parallax
+        type: number
+      - description: Расстояние до звезды (пк)
+        in: formData
+        name: distance
+        type: number
+      - description: Изображение звезды
+        in: formData
+        name: image
+        type: file
+      - description: Альтернативное имя поля изображения
+        in: formData
+        name: pic
+        type: file
+      - description: Видеоролик звезды
+        in: formData
+        name: video
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ds.ParallaxStarDraftSerializer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Добавление новой звезды (черновик) с медиафайлами
+      tags:
+      - parallax_stars
+  /api/parallax_stars/{id}:
+    delete:
+      description: Переводит статус услуги в deleted с помощью SQL UPDATE. Доступно
+        только создателю.
+      parameters:
+      - description: ID звезды
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Логическое удаление звезды (soft delete)
+      tags:
+      - parallax_stars
+  /api/parallax_stars/{id}/like:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет (like=1) или удаляет (like=0) лайк от текущего авторизованного
+        пользователя
+      parameters:
+      - description: ID звезды
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Параметр like (1 или 0)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ds.LikeParallaxStarRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Установка или отмена лайка
+      tags:
+      - parallax_stars
+  /api/parallax_stars/{id}/publish:
+    put:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Переводит черновик текущего создателя в статус published, рассчитывает
+        расстояние и выставляет дату завершения
+      parameters:
+      - description: ID звезды
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Параметры публикации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ds.PublishParallaxStarRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.ParallaxStarFeedSerializer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Публикация черновика звезды
+      tags:
+      - parallax_stars
+  /api/parallax_stars/draft:
+    get:
+      description: Возвращает активный черновик услуги-звезды авторизованного создателя
+        (синглтон, не более 1 на пользователя)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.ParallaxStarDraftSerializer'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Черновик текущего пользователя
+      tags:
+      - parallax_stars
+  /api/parallax_stars/feed:
+    get:
+      description: Возвращает опубликованную звезду для вертикальной ленты с признаком
+        is_liked. При параметрах ?id=...&next=true возвращается следующая звезда.
+      parameters:
+      - description: Текущий ID звезды
+        in: query
+        name: id
+        type: integer
+      - description: Перейти к следующей звезде
+        in: query
+        name: next
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.ParallaxStarFeedSerializer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      summary: Лента опубликованных звезд (Vibes)
+      tags:
+      - parallax_stars
+  /api/users/{id}:
+    get:
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.UserSerializer'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получение информации о пользователе по ID
+      tags:
+      - users
+  /api/users/login:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Проверяет логин и пароль, возвращает JWT токен и выставляет HTTP-only
+        cookie
+      parameters:
+      - description: Учетные данные пользователя
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ds.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      summary: Аутентификация пользователя
+      tags:
+      - users
+  /api/users/logout:
+    post:
+      description: Отзывает текущий JWT токен и заносит его в черный список (blacklist)
+        Redis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Деавторизация пользователя
+      tags:
+      - users
+  /api/users/register:
+    post:
+      consumes:
+      - application/json
+      - multipart/form-data
+      description: Создает нового пользователя в системе с ролью создателя услуг (Astronomer)
+      parameters:
+      - description: Данные регистрации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/ds.UserRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ds.UserSerializer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ds.ErrorResponse'
+      summary: Регистрация нового пользователя
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: 'Введите токен с префиксом Bearer: "Bearer <ваш_токен>"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

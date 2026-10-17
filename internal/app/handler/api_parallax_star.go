@@ -7,25 +7,31 @@ import (
 	"strings"
 
 	"stellar-measurements-backend/internal/app/ds"
-	"stellar-measurements-backend/internal/app/session"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
-// GetParallaxStarsAPI - GET /api/parallax_stars
-// Получение списка опубликованных звезд с возможностью фильтрации по расстоянию.
-// Для каждой звезды возвращается признак is_creator (0/1), если создатель совпадает с текущим пользователем.
+// GetParallaxStarsAPI godoc
+// @Summary Список опубликованных звезд каталога
+// @Description Возвращает опубликованные звезды с поддержкой серверной фильтрации по расстоянию. Для авторизованных пользователей признак is_creator (1/0) указывает авторство текущего пользователя.
+// @Tags parallax_stars
+// @Produce json
+// @Param distance query number false "Максимальное расстояние до звезды (пк)"
+// @Success 200 {array} ds.ParallaxStarCatalogItemSerializer
+// @Failure 400 {object} ds.ErrorResponse
+// @Failure 500 {object} ds.ErrorResponse
+// @Router /api/parallax_stars [get]
 func (h *Handler) GetParallaxStarsAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
+	currentUserID := GetContextUserID(ctx)
 	distanceStr := ctx.Query("distance")
 
 	var maxDistance *float64
 	if distanceStr != "" {
 		d, err := strconv.ParseFloat(distanceStr, 64)
 		if err != nil || d < 0 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Некорректное значение фильтра distance (должно быть неотрицательным числом)",
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Некорректное значение фильтра distance (должно быть неотрицательным числом)",
 			})
 			return
 		}
@@ -35,8 +41,8 @@ func (h *Handler) GetParallaxStarsAPI(ctx *gin.Context) {
 	stars, err := h.Repository.GetPublishedParallaxStarsFiltered(maxDistance)
 	if err != nil {
 		logrus.Errorf("Ошибка получения каталога звезд: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Не удалось загрузить список звезд",
+		ctx.JSON(http.StatusInternalServerError, ds.ErrorResponse{
+			Error: "Не удалось загрузить список звезд",
 		})
 		return
 	}
@@ -44,7 +50,7 @@ func (h *Handler) GetParallaxStarsAPI(ctx *gin.Context) {
 	result := make([]ds.ParallaxStarCatalogItemSerializer, 0, len(stars))
 	for _, star := range stars {
 		isCreator := 0
-		if star.CreatorID == currentUserID {
+		if currentUserID > 0 && star.CreatorID == currentUserID {
 			isCreator = 1
 		}
 
@@ -61,11 +67,19 @@ func (h *Handler) GetParallaxStarsAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-// GetParallaxStarFeedAPI - GET /api/parallax_stars/feed
-// Лента опубликованных звезд (только опубликованные). Возвращает признак is_liked (0/1),
-// если текущий пользователь лайкнул эту услугу. С параметрами ?id=...&next=true переходит к следующей звезде.
+// GetParallaxStarFeedAPI godoc
+// @Summary Лента опубликованных звезд (Vibes)
+// @Description Возвращает опубликованную звезду для вертикальной ленты с признаком is_liked. При параметрах ?id=...&next=true возвращается следующая звезда.
+// @Tags parallax_stars
+// @Produce json
+// @Param id query int false "Текущий ID звезды"
+// @Param next query bool false "Перейти к следующей звезде"
+// @Success 200 {object} ds.ParallaxStarFeedSerializer
+// @Failure 400 {object} ds.ErrorResponse
+// @Failure 404 {object} ds.ErrorResponse
+// @Router /api/parallax_stars/feed [get]
 func (h *Handler) GetParallaxStarFeedAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
+	currentUserID := GetContextUserID(ctx)
 	idStr := ctx.Query("id")
 	next := ctx.Query("next") == "true"
 
@@ -73,8 +87,8 @@ func (h *Handler) GetParallaxStarFeedAPI(ctx *gin.Context) {
 	if idStr != "" {
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Неверный ID звезды",
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Неверный ID звезды",
 			})
 			return
 		}
@@ -83,8 +97,8 @@ func (h *Handler) GetParallaxStarFeedAPI(ctx *gin.Context) {
 
 	star, err := h.Repository.GetParallaxStarFeed(starID, next)
 	if err != nil || star == nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "Опубликованная звезда не найдена",
+		ctx.JSON(http.StatusNotFound, ds.ErrorResponse{
+			Error: "Опубликованная звезда не найдена",
 		})
 		return
 	}
@@ -93,22 +107,38 @@ func (h *Handler) GetParallaxStarFeedAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, serializer)
 }
 
-// GetDraftAPI - GET /api/parallax_stars/draft
-// Получение черновика текущего пользователя (не более 1 записи, ID не указывается в URL).
+// GetDraftAPI godoc
+// @Summary Черновик текущего пользователя
+// @Description Возвращает активный черновик услуги-звезды авторизованного создателя (синглтон, не более 1 на пользователя)
+// @Tags parallax_stars
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {object} ds.ParallaxStarDraftSerializer
+// @Failure 401 {object} ds.ErrorResponse
+// @Failure 404 {object} ds.ErrorResponse
+// @Failure 500 {object} ds.ErrorResponse
+// @Router /api/parallax_stars/draft [get]
 func (h *Handler) GetDraftAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
+	currentUserID := GetContextUserID(ctx)
+	if currentUserID == 0 {
+		ctx.JSON(http.StatusUnauthorized, ds.ErrorResponse{
+			Error: "Требуется авторизация",
+		})
+		return
+	}
+
 	draft, err := h.Repository.GetDraftByCreator(currentUserID)
 	if err != nil {
 		logrus.Errorf("Ошибка поиска черновика: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Ошибка сервера при поиске черновика",
+		ctx.JSON(http.StatusInternalServerError, ds.ErrorResponse{
+			Error: "Ошибка сервера при поиске черновика",
 		})
 		return
 	}
 
 	if draft == nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "Активный черновик у пользователя отсутствует",
+		ctx.JSON(http.StatusNotFound, ds.ErrorResponse{
+			Error: "Активный черновик у пользователя отсутствует",
 		})
 		return
 	}
@@ -117,23 +147,44 @@ func (h *Handler) GetDraftAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, serializer)
 }
 
-// AddParallaxStarAPI - POST /api/parallax_stars
-// Добавление новой услуги-звезды в статусе черновик с загрузкой файлов изображения и видео в MinIO.
-// Названия файлов генерируются на латинице. Системные поля рассчитываются бэкендом.
+// AddParallaxStarAPI godoc
+// @Summary Добавление новой звезды (черновик) с медиафайлами
+// @Description Создает черновик услуги с автозаполнением создателя из JWT токена и загрузкой фото/видео в MinIO
+// @Tags parallax_stars
+// @Security BearerAuth
+// @Accept multipart/form-data
+// @Produce json
+// @Param name formData string true "Название звезды"
+// @Param description formData string false "Краткое описание"
+// @Param parallax formData number false "Годичный параллакс (угловые секунды)"
+// @Param distance formData number false "Расстояние до звезды (пк)"
+// @Param image formData file false "Изображение звезды"
+// @Param pic formData file false "Альтернативное имя поля изображения"
+// @Param video formData file false "Видеоролик звезды"
+// @Success 201 {object} ds.ParallaxStarDraftSerializer
+// @Failure 400 {object} ds.ErrorResponse
+// @Failure 401 {object} ds.ErrorResponse
+// @Router /api/parallax_stars [post]
 func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
+	currentUserID := GetContextUserID(ctx)
+	if currentUserID == 0 {
+		ctx.JSON(http.StatusUnauthorized, ds.ErrorResponse{
+			Error: "Требуется авторизация",
+		})
+		return
+	}
 
 	if err := ctx.Request.ParseMultipartForm(32 << 20); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Ошибка чтения multipart формы: " + err.Error(),
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: "Ошибка чтения multipart формы: " + err.Error(),
 		})
 		return
 	}
 
 	name := strings.TrimSpace(ctx.Request.FormValue("name"))
 	if name == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Поле 'name' обязательно для заполнения",
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: "Поле 'name' обязательно для заполнения",
 		})
 		return
 	}
@@ -144,8 +195,8 @@ func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
 	if pStr := ctx.Request.FormValue("parallax"); pStr != "" {
 		p, err := strconv.ParseFloat(pStr, 64)
 		if err != nil || p < 0 || p > 9.999 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Параллакс должен быть числом от 0 до 9.999",
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Параллакс должен быть числом от 0 до 9.999",
 			})
 			return
 		}
@@ -156,8 +207,8 @@ func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
 	if dStr := ctx.Request.FormValue("distance"); dStr != "" {
 		d, err := strconv.ParseFloat(dStr, 64)
 		if err != nil || d < 0 || d > 999.99 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Расстояние должно быть числом от 0 до 999.99",
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Расстояние должно быть числом от 0 до 999.99",
 			})
 			return
 		}
@@ -182,8 +233,8 @@ func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
 	)
 	if err != nil {
 		logrus.Errorf("Ошибка создания звезды: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: err.Error(),
 		})
 		return
 	}
@@ -192,16 +243,35 @@ func (h *Handler) AddParallaxStarAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, serializer)
 }
 
-// PublishParallaxStarAPI - PUT /api/parallax_stars/:id/publish
-// Публикация черновика (смена статуса на 'published'): фиксация даты формирования (date_finish),
-// заполнение описания, годичного параллакса и расчет расстояния.
+// PublishParallaxStarAPI godoc
+// @Summary Публикация черновика звезды
+// @Description Переводит черновик текущего создателя в статус published, рассчитывает расстояние и выставляет дату завершения
+// @Tags parallax_stars
+// @Security BearerAuth
+// @Accept json
+// @Accept multipart/form-data
+// @Produce json
+// @Param id path int true "ID звезды"
+// @Param request body ds.PublishParallaxStarRequest true "Параметры публикации"
+// @Success 200 {object} ds.ParallaxStarFeedSerializer
+// @Failure 400 {object} ds.ErrorResponse
+// @Failure 401 {object} ds.ErrorResponse
+// @Failure 403 {object} ds.ErrorResponse
+// @Router /api/parallax_stars/{id}/publish [put]
 func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
+	currentUserID := GetContextUserID(ctx)
+	if currentUserID == 0 {
+		ctx.JSON(http.StatusUnauthorized, ds.ErrorResponse{
+			Error: "Требуется авторизация",
+		})
+		return
+	}
+
 	idStr := ctx.Param("id")
 	starID, err := strconv.Atoi(idStr)
 	if err != nil || starID <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Некорректный ID звезды",
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: "Некорректный ID звезды",
 		})
 		return
 	}
@@ -209,8 +279,8 @@ func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 	var req ds.PublishParallaxStarRequest
 	if strings.Contains(ctx.GetHeader("Content-Type"), "application/json") {
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Некорректный JSON: " + err.Error(),
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Некорректный JSON: " + err.Error(),
 			})
 			return
 		}
@@ -230,8 +300,8 @@ func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 
 	if req.Parallax != nil {
 		if *req.Parallax <= 0 || *req.Parallax > 9.999 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Годичный параллакс должен быть в диапазоне от 0.001 до 9.999",
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Годичный параллакс должен быть в диапазоне от 0.001 до 9.999",
 			})
 			return
 		}
@@ -241,8 +311,8 @@ func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 
 	if req.Distance != nil {
 		if *req.Distance < 0.01 || *req.Distance > 999.99 {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": "Расстояние должно быть в диапазоне от 0.01 до 999.99",
+			ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+				Error: "Расстояние должно быть в диапазоне от 0.01 до 999.99",
 			})
 			return
 		}
@@ -259,8 +329,14 @@ func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 	)
 	if err != nil {
 		logrus.Errorf("Ошибка публикации звезды: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+		if strings.Contains(err.Error(), "только создатель") {
+			ctx.JSON(http.StatusForbidden, ds.ErrorResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: err.Error(),
 		})
 		return
 	}
@@ -269,16 +345,32 @@ func (h *Handler) PublishParallaxStarAPI(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, serializer)
 }
 
-// DeleteParallaxStarAPI - DELETE /api/parallax_stars/:id
-// Логическое удаление услуги (только soft delete, статус меняется на 'deleted').
-// Разрешено только создателю услуги.
+// DeleteParallaxStarAPI godoc
+// @Summary Логическое удаление звезды (soft delete)
+// @Description Переводит статус услуги в deleted с помощью SQL UPDATE. Доступно только создателю.
+// @Tags parallax_stars
+// @Security BearerAuth
+// @Produce json
+// @Param id path int true "ID звезды"
+// @Success 200 {object} ds.MessageResponse
+// @Failure 400 {object} ds.ErrorResponse
+// @Failure 401 {object} ds.ErrorResponse
+// @Failure 403 {object} ds.ErrorResponse
+// @Router /api/parallax_stars/{id} [delete]
 func (h *Handler) DeleteParallaxStarAPI(ctx *gin.Context) {
-	currentUserID := session.GetCurrentUserID()
+	currentUserID := GetContextUserID(ctx)
+	if currentUserID == 0 {
+		ctx.JSON(http.StatusUnauthorized, ds.ErrorResponse{
+			Error: "Требуется авторизация",
+		})
+		return
+	}
+
 	idStr := ctx.Param("id")
 	starID, err := strconv.Atoi(idStr)
 	if err != nil || starID <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Некорректный ID звезды",
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: "Некорректный ID звезды",
 		})
 		return
 	}
@@ -286,36 +378,61 @@ func (h *Handler) DeleteParallaxStarAPI(ctx *gin.Context) {
 	err = h.Repository.SoftDeleteParallaxStarByCreator(uint(starID), currentUserID)
 	if err != nil {
 		logrus.Errorf("Ошибка логического удаления: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+		if strings.Contains(err.Error(), "только создатель") {
+			ctx.JSON(http.StatusForbidden, ds.ErrorResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{
+			Error: err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Звезда успешно удалена (soft delete)",
+	ctx.JSON(http.StatusOK, ds.MessageResponse{
+		Message: "Звезда успешно удалена (soft delete)",
 	})
 }
 
-// LikeParallaxStarAPI - POST /api/parallax_stars/:id/like
-// Поставить (like=1) или отменить (like=0) лайк от текущего пользователя.
+// LikeParallaxStarAPI godoc
+// @Summary Установка или отмена лайка
+// @Description Добавляет (like=1) или удаляет (like=0) лайк от текущего авторизованного пользователя
+// @Tags parallax_stars
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path int true "ID звезды"
+// @Param request body ds.LikeParallaxStarRequest true "Параметр like (1 или 0)"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} ds.ErrorResponse
+// @Failure 401 {object} ds.ErrorResponse
+// @Router /api/parallax_stars/{id}/like [post]
 func (h *Handler) LikeParallaxStarAPI(ctx *gin.Context) {
+	currentUserID := GetContextUserID(ctx)
+	if currentUserID == 0 {
+		ctx.JSON(http.StatusUnauthorized, ds.ErrorResponse{
+			Error: "Требуется авторизация для управления лайками",
+		})
+		return
+	}
+
 	starID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil || starID <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID звезды"})
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{Error: "Некорректный ID звезды"})
 		return
 	}
 
 	var req ds.LikeParallaxStarRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Поле 'like' должно быть 1 или 0"})
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{Error: "Поле 'like' должно быть 1 или 0"})
 		return
 	}
 
-	isLiked, likesCount, err := h.Repository.ToggleStarLike(uint(starID), session.GetCurrentUserID(), req.Like)
+	isLiked, likesCount, err := h.Repository.ToggleStarLike(uint(starID), currentUserID, req.Like)
 	if err != nil {
 		logrus.Errorf("Ошибка обработки лайка: %v", err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, ds.ErrorResponse{Error: err.Error()})
 		return
 	}
 

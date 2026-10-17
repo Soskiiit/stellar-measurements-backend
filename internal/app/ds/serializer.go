@@ -1,9 +1,14 @@
 package ds
 
+import (
+	"stellar-measurements-backend/internal/app/role"
+)
+
 type UserSerializer struct {
-	ID          uint   `json:"id"`
-	Login       string `json:"login"`
-	IsModerator bool   `json:"is_moderator"`
+	ID          uint      `json:"id"`
+	Login       string    `json:"login"`
+	Role        role.Role `json:"role"`
+	IsModerator bool      `json:"is_moderator"`
 }
 
 func ToUserSerializer(user *User) UserSerializer {
@@ -13,6 +18,7 @@ func ToUserSerializer(user *User) UserSerializer {
 	return UserSerializer{
 		ID:          user.ID,
 		Login:       user.Login,
+		Role:        user.Role,
 		IsModerator: user.IsModerator,
 	}
 }

@@ -45,6 +45,10 @@ func main() {
 	db.Exec("DROP INDEX IF EXISTS idx_parallax_stars_creator_draft;")
 	db.Exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_parallax_stars_creator_draft ON parallax_stars (creator_id) WHERE status = 'draft';")
 
+	// Синхронизация ролей пользователей для ЛР4
+	db.Exec("UPDATE users SET role = 1 WHERE is_moderator = true;")
+	db.Exec("UPDATE users SET is_moderator = true WHERE role = 1;")
+
 	logrus.Info("Database schema migrated successfully")
 
 	seedData(db)
@@ -55,15 +59,15 @@ func seedData(db *gorm.DB) {
 	db.Model(&ds.User{}).Count(&userCount)
 	if userCount == 0 {
 		users := []ds.User{
-			{ID: 1, Login: "user1", Password: "password1", IsModerator: false},
-			{ID: 2, Login: "user2", Password: "password2", IsModerator: true},
-			{ID: 3, Login: "user3", Password: "password3", IsModerator: false},
-			{ID: 4, Login: "user4", Password: "password4", IsModerator: false},
-			{ID: 5, Login: "user5", Password: "password5", IsModerator: false},
-			{ID: 6, Login: "user6", Password: "password6", IsModerator: false},
-			{ID: 7, Login: "user7", Password: "password7", IsModerator: false},
-			{ID: 8, Login: "user8", Password: "password8", IsModerator: false},
-			{ID: 9, Login: "user9", Password: "password9", IsModerator: false},
+			{ID: 1, Login: "user1", Password: "password1", Role: 0, IsModerator: false},
+			{ID: 2, Login: "user2", Password: "password2", Role: 1, IsModerator: true},
+			{ID: 3, Login: "user3", Password: "password3", Role: 0, IsModerator: false},
+			{ID: 4, Login: "user4", Password: "password4", Role: 0, IsModerator: false},
+			{ID: 5, Login: "user5", Password: "password5", Role: 0, IsModerator: false},
+			{ID: 6, Login: "user6", Password: "password6", Role: 0, IsModerator: false},
+			{ID: 7, Login: "user7", Password: "password7", Role: 0, IsModerator: false},
+			{ID: 8, Login: "user8", Password: "password8", Role: 0, IsModerator: false},
+			{ID: 9, Login: "user9", Password: "password9", Role: 0, IsModerator: false},
 		}
 		if err := db.Create(&users).Error; err != nil {
 			logrus.Errorf("Error seeding users: %v", err)
